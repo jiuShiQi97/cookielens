@@ -17,19 +17,22 @@ def analyze_with_claude(scan_data):
         region = os.getenv('AWS_REGION', 'us-east-1')
         
         # Build analysis prompt
-        prompt = f"""Please analyze the following website privacy scan results and generate a concise and easy-to-understand privacy analysis report.
+        prompt = f"""Analyze this website privacy scan and provide a BRIEF summary (max 100 words).
 
 Scan data:
 {json.dumps(scan_data, indent=2)}
 
-Please analyze from the following dimensions:
-1. **Cookie Security**: Check security attributes such as httpOnly, secure, sameSite, etc.
-2. **Data Storage**: What data is stored in localStorage
-3. **Third-party Services**: Identify and explain the purpose of detected third-party domains
-4. **Privacy Risk Rating**: Low/Medium/High, and explain the reason
-5. **Improvement Recommendations**: If there are security risks, provide specific suggestions
+Format:
+**Risk Level**: [Low/Medium/High]
+**Key Findings**: (2-3 bullet points only)
+- Most important security issue
+- Most important privacy concern
 
-Please answer clearly in English, using markdown format, suitable for non-technical readers."""
+**Quick Recommendations**: (2-3 actions max)
+- Top priority fix
+- Secondary recommendation
+
+Keep it SHORT and actionable. Focus on the most critical issues only."""
 
         # Call Bedrock API using HTTP request
         url = f"https://bedrock-runtime.{region}.amazonaws.com/model/anthropic.claude-3-sonnet-20240229-v1:0/invoke"
@@ -42,7 +45,7 @@ Please answer clearly in English, using markdown format, suitable for non-techni
         
         payload = {
             "anthropic_version": "bedrock-2023-05-31",
-            "max_tokens": 2000,
+            "max_tokens": 500,  # Reduced from 2000 for shorter responses
             "messages": [
                 {
                     "role": "user",
