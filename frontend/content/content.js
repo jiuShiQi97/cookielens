@@ -12,6 +12,8 @@
   initCookieBannerDetection();
   
   function initCookieBannerDetection() {
+    console.log('CookieLens: Initializing privacy analysis...');
+    
     // Check if we've already shown modal for this host
     checkModalStatus();
     
@@ -112,21 +114,12 @@
   async function autoDetectCookieBanner() {
     if (modalShown) return;
     
-    // Check if auto-detection is enabled
-    try {
-      const result = await chrome.storage.sync.get(['autoDetect']);
-      if (!result.autoDetect) {
-        console.log('CookieLens: Auto-detection disabled');
-        return;
-      }
-    } catch (error) {
-      console.warn('CookieLens: Failed to check auto-detection setting:', error);
-      return;
-    }
+    // Always show modal for testing (remove auto-detection check)
+    console.log('CookieLens: Auto-showing privacy analysis modal');
     
     // Wait a bit for page to fully load, then show modal automatically
     setTimeout(() => {
-      console.log('CookieLens: Auto-showing privacy analysis modal');
+      console.log('CookieLens: Showing privacy analysis modal');
       showExplanationModal();
     }, 2000); // Wait 2 seconds for page to load
   }
@@ -210,6 +203,8 @@
   }
   
   function showExplanationModal() {
+    console.log('CookieLens: Creating modal...');
+    
     // Create shadow DOM to avoid CSS conflicts
     const shadowHost = document.createElement('div');
     shadowHost.id = 'cookielens-shadow-host';
@@ -226,11 +221,15 @@
     const modalHTML = createSimpleModalHTML();
     shadowRoot.innerHTML = style.outerHTML + modalHTML;
     
+    console.log('CookieLens: Modal HTML created:', modalHTML);
+    
     // Add event listeners
     setupModalEventListeners(shadowRoot);
     
     // Mark as shown
     setModalShown();
+    
+    console.log('CookieLens: Modal displayed successfully');
   }
   
   function getModalCSS() {
