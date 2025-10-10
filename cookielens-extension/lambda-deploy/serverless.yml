@@ -1,0 +1,143 @@
+service: cookielens-lambda
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: python3.9
+  region: us-east-1
+  stage: ${opt:stage, 'dev'}
+  timeout: 300  # 5 minutes for Playwright scanning
+  memorySize: 1024  # Increased memory for Playwright
+  
+  # Environment variables
+  environment:
+    AWS_REGION: ${self:provider.region}
+    MODEL_ID: anthropic.claude-3-5-sonnet-20240620-v1:0
+    SYSTEM_PROMPT: "你是CookieLens合规助手。请用清晰中文、Markdown输出，面向非技术读者。语气客观、简洁。"
+    S3_BUCKET: ${self:service}-${self:provider.stage}-scans
+  
+  # IAM Role Permissions
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - bedrock:InvokeModel
+          Resource: 
+            - arn:aws:bedrock:${self:provider.region}::foundation-model/anthropic.claude-3-5-sonnet-20240620-v1:0
+        - Effect: Allow
+          Action:
+            - s3:PutObject
+            - s3:PutObjectAcl
+          Resource: 
+            - arn:aws:s3:::${self:service}-${self:provider.stage}-scans/*
+        - Effect: Allow
+          Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+          Resource: "*"
+
+functions:
+  scanWebsite:
+    handler: lambda_function.lambda_handler
+    description: "CookieLens website privacy scanner"
+    events:
+      - http:
+          path: /scan
+          method: post
+          cors: true
+      - http:
+          path: /scan
+          method: get
+          cors: true
+    layers:
+      - Ref: PlaywrightLayer
+
+  # Health check endpoint
+  health:
+    handler: lambda_function.lambda_handler
+    description: "Health check endpoint"
+    events:
+      - http:
+          path: /health
+          method: get
+          cors: true
+
+plugins:
+  - serverless-python-requirements
+  - serverless-layers
+
+custom:
+  pythonRequirements:
+    dockerizePip: true
+    layer:
+      name: ${self:service}-${self:provider.stage}-python-deps
+      description: Python dependencies for CookieLens
+      compatibleRuntimes:
+        - python3.9
+      retain: false
+    slim: true
+    slimPatterns:
+      - "**/*.pyc"
+      - "**/__pycache__"
+      - "**/tests"
+      - "**/test"
+      - "**/*.dist-info"
+      - "**/*.egg-info"
+  
+  # Playwright layer configuration
+  layers:
+    - name: playwright-layer
+      path: ./layers/playwright
+      description: Playwright browser binaries for Lambda
+      compatibleRuntimes:
+        - python3.9
+      retain: false
+
+resources:
+  Resources:
+    # S3 Bucket for storing scan results
+    ScansBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:service}-${self:provider.stage}-scans
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: true
+          BlockPublicPolicy: true
+          IgnorePublicAcls: true
+          RestrictPublicBuckets: true
+        LifecycleConfiguration:
+          Rules:
+            - Id: DeleteOldScans
+              Status: Enabled
+              ExpirationInDays: 30  # Keep scans for 30 days
+
+    # API Gateway Custom Domain (optional)
+    ApiGatewayRestApi:
+      Type: AWS::ApiGateway::RestApi
+      Properties:
+        Name: ${self:service}-${self:provider.stage}-api
+        Description: CookieLens API Gateway
+
+  Outputs:
+    ApiGatewayRestApiId:
+      Value:
+        Ref: ApiGatewayRestApi
+      Export:
+        Name: ${self:service}-${self:provider.stage}-api-id
+    
+    ApiGatewayRestApiRootResourceId:
+      Value:
+        Fn::GetAtt:
+          - ApiGatewayRestApi
+          - RootResourceId
+      Export:
+        Name: ${self:service}-${self:provider.stage}-api-root-resource-id
+    
+    ScansBucketName:
+      Value:
+        Ref: ScansBucket
+      Export:
+        Name: ${self:service}-${self:provider.stage}-scans-bucket

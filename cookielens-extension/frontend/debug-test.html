@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CookieLens Debug Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .debug-section {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .test-button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        .result {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .status {
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-weight: 500;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .url-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+        .debug-info {
+            background: #e9ecef;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 CookieLens Debug Test Page</h1>
+    
+    <div class="debug-section">
+        <h2>📊 Current Page Information</h2>
+        <div class="debug-info">
+            <p><strong>Current URL:</strong> <span id="currentUrl"></span></p>
+            <p><strong>User Agent:</strong> <span id="userAgent"></span></p>
+            <p><strong>Extension Status:</strong> <span id="extensionStatus">Checking...</span></p>
+        </div>
+    </div>
+
+    <div class="debug-section">
+        <h2>🧪 Direct API Test</h2>
+        <p>Test the Lambda API directly from this page:</p>
+        <input type="url" id="testUrl" class="url-input" placeholder="https://example.com" value="https://github.com">
+        <br>
+        <button class="test-button" onclick="testDirectAPI()">Test Direct API Call</button>
+        <button class="test-button" onclick="testCORS()">Test CORS</button>
+        <div id="directStatus"></div>
+        <div id="directResult" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="debug-section">
+        <h2>🌐 Extension Simulation</h2>
+        <p>Simulate what the browser extension would do:</p>
+        <button class="test-button" onclick="simulateExtension()">Simulate Extension</button>
+        <button class="test-button" onclick="checkConsole()">Check Console Logs</button>
+        <div id="extensionTestStatus"></div>
+    </div>
+
+    <div class="debug-section">
+        <h2>🔍 Troubleshooting</h2>
+        <h3>Common Issues:</h3>
+        <ul>
+            <li><strong>CORS Error:</strong> Browser blocks cross-origin requests</li>
+            <li><strong>Network Error:</strong> API endpoint not accessible</li>
+            <li><strong>Extension Not Loaded:</strong> Extension not properly installed</li>
+            <li><strong>Content Script Error:</strong> JavaScript error in extension</li>
+        </ul>
+        
+        <h3>Debug Steps:</h3>
+        <ol>
+            <li>Open Chrome DevTools (F12)</li>
+            <li>Go to Console tab</li>
+            <li>Look for CookieLens logs</li>
+            <li>Check Network tab for API calls</li>
+            <li>Verify extension is loaded in chrome://extensions/</li>
+        </ol>
+    </div>
+
+    <script>
+        const LAMBDA_API_URL = 'https://kr9knqhdha.execute-api.us-east-1.amazonaws.com/prod/scan';
+        
+        // Update page info
+        document.getElementById('currentUrl').textContent = window.location.href;
+        document.getElementById('userAgent').textContent = navigator.userAgent;
+        
+        // Check if extension is loaded
+        if (typeof chrome !== 'undefined' && chrome.runtime) {
+            document.getElementById('extensionStatus').textContent = '✅ Chrome Extension API Available';
+        } else {
+            document.getElementById('extensionStatus').textContent = '❌ Chrome Extension API Not Available';
+        }
+        
+        function showStatus(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+        
+        function showResult(elementId, data) {
+            const element = document.getElementById(elementId);
+            element.textContent = JSON.stringify(data, null, 2);
+            element.style.display = 'block';
+        }
+        
+        async function testDirectAPI() {
+            const url = document.getElementById('testUrl').value.trim();
+            if (!url) {
+                showStatus('directStatus', 'Please enter a URL', 'error');
+                return;
+            }
+            
+            showStatus('directStatus', 'Testing direct API call...', 'info');
+            
+            try {
+                console.log('Testing direct API call to:', LAMBDA_API_URL);
+                console.log('With URL:', url);
+                
+                const startTime = Date.now();
+                
+                const response = await fetch(LAMBDA_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ url: url })
+                });
+                
+                const endTime = Date.now();
+                const responseTime = endTime - startTime;
+                
+                console.log('Response status:', response.status);
+                console.log('Response time:', responseTime + 'ms');
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('API Error:', response.status, errorText);
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log('API Response:', data);
+                
+                showStatus('directStatus', `✅ Success! Response time: ${responseTime}ms`, 'success');
+                showResult('directResult', {
+                    url: url,
+                    responseTime: responseTime,
+                    status: response.status,
+                    data: data
+                });
+                
+            } catch (error) {
+                console.error('Direct API test failed:', error);
+                showStatus('directStatus', `❌ Error: ${error.message}`, 'error');
+                showResult('directResult', { 
+                    error: error.message,
+                    type: error.name,
+                    stack: error.stack
+                });
+            }
+        }
+        
+        async function testCORS() {
+            showStatus('directStatus', 'Testing CORS...', 'info');
+            
+            try {
+                // Test preflight request
+                const response = await fetch(LAMBDA_API_URL, {
+                    method: 'OPTIONS',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Request-Method': 'POST',
+                        'Access-Control-Request-Headers': 'Content-Type'
+                    }
+                });
+                
+                console.log('CORS preflight response:', response.status);
+                console.log('CORS headers:', [...response.headers.entries()]);
+                
+                if (response.ok) {
+                    showStatus('directStatus', '✅ CORS preflight successful', 'success');
+                } else {
+                    showStatus('directStatus', `⚠️ CORS preflight failed: ${response.status}`, 'error');
+                }
+                
+            } catch (error) {
+                console.error('CORS test failed:', error);
+                showStatus('directStatus', `❌ CORS Error: ${error.message}`, 'error');
+            }
+        }
+        
+        function simulateExtension() {
+            showStatus('extensionTestStatus', 'Simulating extension behavior...', 'info');
+            
+            // Create a modal similar to the extension
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 10000;
+            `;
+            
+            modal.innerHTML = `
+                <div style="background: white; padding: 30px; border-radius: 12px; max-width: 500px; width: 90%;">
+                    <h3 style="margin-top: 0;">🍪 CookieLens Extension Simulation</h3>
+                    <p>This simulates the browser extension modal.</p>
+                    <p><strong>Current URL:</strong> ${window.location.href}</p>
+                    <p><strong>API Endpoint:</strong> ${LAMBDA_API_URL}</p>
+                    <div style="margin: 20px 0;">
+                        <button onclick="testExtensionAPI()" style="background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; margin-right: 10px;">
+                            Test Current Page
+                        </button>
+                        <button onclick="this.closest('[style*=\"position: fixed\"]').remove()" style="background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer;">
+                            Close
+                        </button>
+                    </div>
+                    <div id="extensionTestResult" style="margin-top: 15px;"></div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Add the test function to global scope
+            window.testExtensionAPI = async function() {
+                const resultDiv = document.getElementById('extensionTestResult');
+                resultDiv.innerHTML = '<div style="color: #007bff;">Testing current page...</div>';
+                
+                try {
+                    console.log('Extension simulation: Testing API call');
+                    
+                    const response = await fetch(LAMBDA_API_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ url: window.location.href })
+                    });
+                    
+                    console.log('Extension simulation: Response received', response.status);
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        console.log('Extension simulation: Data received', data);
+                        
+                        resultDiv.innerHTML = `
+                            <div style="color: #28a745; font-size: 14px;">
+                                ✅ Analysis complete!<br>
+                                Cookies: ${data.cookies?.length || 0}<br>
+                                Third parties: ${data.thirdParties?.length || 0}<br>
+                                Method: ${data.method || 'unknown'}<br>
+                                Response time: ~${Date.now() - window.startTime}ms
+                            </div>
+                        `;
+                    } else {
+                        resultDiv.innerHTML = `<div style="color: #dc3545;">❌ Error: HTTP ${response.status}</div>`;
+                    }
+                } catch (error) {
+                    console.error('Extension simulation error:', error);
+                    resultDiv.innerHTML = `<div style="color: #dc3545;">❌ Error: ${error.message}</div>`;
+                }
+            };
+            
+            window.startTime = Date.now();
+            showStatus('extensionTestStatus', '✅ Extension simulation modal created', 'success');
+        }
+        
+        function checkConsole() {
+            showStatus('extensionTestStatus', 'Check the browser console (F12) for CookieLens logs', 'info');
+            console.log('=== CookieLens Debug Information ===');
+            console.log('Current URL:', window.location.href);
+            console.log('API Endpoint:', LAMBDA_API_URL);
+            console.log('Extension API Available:', typeof chrome !== 'undefined' && chrome.runtime);
+            console.log('User Agent:', navigator.userAgent);
+            console.log('=====================================');
+        }
+        
+        // Auto-run some tests on page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                console.log('CookieLens Debug Page Loaded');
+                showStatus('directStatus', 'Ready to test! Click "Test Direct API Call" to start.', 'info');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

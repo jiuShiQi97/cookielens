@@ -1,0 +1,21 @@
+{
+  "name": "cookielens-lambda",
+  "version": "1.0.0",
+  "description": "CookieLens Lambda deployment package",
+  "scripts": {
+    "deploy": "serverless deploy",
+    "deploy:prod": "serverless deploy --stage prod",
+    "remove": "serverless remove",
+    "logs": "serverless logs -f scanWebsite",
+    "invoke": "serverless invoke -f scanWebsite",
+    "test": "serverless invoke -f scanWebsite --data '{\"body\":\"{\\\"url\\\":\\\"https://example.com\\\"}\"}'"
+  },
+  "devDependencies": {
+    "serverless": "^3.38.0",
+    "serverless-python-requirements": "^6.0.0",
+    "serverless-layers": "^2.6.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

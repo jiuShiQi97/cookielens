@@ -1,0 +1,108 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'CookieLens Lambda Function for Website Privacy Scanning'
+
+Globals:
+  Function:
+    Timeout: 300
+    MemorySize: 1024
+    Runtime: python3.9
+    Environment:
+      Variables:
+        AWS_REGION: !Ref AWS::Region
+        MODEL_ID: anthropic.claude-3-5-sonnet-20240620-v1:0
+        SYSTEM_PROMPT: "你是CookieLens合规助手。请用清晰中文、Markdown输出，面向非技术读者。语气客观、简洁。"
+        S3_BUCKET: !Ref ScansBucket
+
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+    Description: Deployment stage (dev, staging, prod)
+
+Resources:
+  # Lambda Function
+  CookieLensFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub 'cookielens-${Stage}'
+      CodeUri: .
+      Handler: lambda_function.lambda_handler
+      Description: 'CookieLens website privacy scanner'
+      Policies:
+        - BedrockInvokeModelPolicy:
+            ModelIds:
+              - anthropic.claude-3-5-sonnet-20240620-v1:0
+        - S3WritePolicy:
+            BucketName: !Ref ScansBucket
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - logs:CreateLogGroup
+                - logs:CreateLogStream
+                - logs:PutLogEvents
+              Resource: '*'
+      Events:
+        ScanApi:
+          Type: Api
+          Properties:
+            Path: /scan
+            Method: post
+            Cors:
+              AllowMethods: "'GET,POST,OPTIONS'"
+              AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              AllowOrigin: "'*'"
+        HealthApi:
+          Type: Api
+          Properties:
+            Path: /health
+            Method: get
+            Cors:
+              AllowOrigin: "'*'"
+
+  # S3 Bucket for scan results
+  ScansBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'cookielens-${Stage}-scans-${AWS::AccountId}'
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      LifecycleConfiguration:
+        Rules:
+          - Id: DeleteOldScans
+            Status: Enabled
+            ExpirationInDays: 30
+
+  # Lambda Layer for Playwright
+  PlaywrightLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: !Sub 'cookielens-playwright-${Stage}'
+      Description: 'Playwright browser binaries for CookieLens'
+      ContentUri: layers/playwright/
+      CompatibleRuntimes:
+        - python3.9
+      RetentionPolicy: Delete
+
+Outputs:
+  ApiUrl:
+    Description: 'API Gateway endpoint URL'
+    Value: !Sub 'https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}/'
+    Export:
+      Name: !Sub '${AWS::StackName}-ApiUrl'
+  
+  ScansBucketName:
+    Description: 'S3 bucket for storing scan results'
+    Value: !Ref ScansBucket
+    Export:
+      Name: !Sub '${AWS::StackName}-ScansBucket'
+  
+  LambdaFunctionName:
+    Description: 'Lambda function name'
+    Value: !Ref CookieLensFunction
+    Export:
+      Name: !Sub '${AWS::StackName}-LambdaFunction'
