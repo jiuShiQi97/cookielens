@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CookieLens Settings</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f9fafb;
+      color: #1f2937;
+    }
+    
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    }
+    
+    h1 {
+      margin: 0 0 24px 0;
+      font-size: 24px;
+      font-weight: 600;
+      color: #1f2937;
+    }
+    
+    .setting-group {
+      margin-bottom: 24px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .setting-group:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+    
+    .setting-label {
+      display: block;
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: #374151;
+    }
+    
+    .setting-description {
+      font-size: 14px;
+      color: #6b7280;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+    
+    .toggle-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .toggle {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+    }
+    
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #d1d5db;
+      transition: 0.2s;
+      border-radius: 24px;
+    }
+    
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.2s;
+      border-radius: 50%;
+    }
+    
+    input:checked + .toggle-slider {
+      background-color: #3b82f6;
+    }
+    
+    input:checked + .toggle-slider:before {
+      transform: translateX(20px);
+    }
+    
+    .toggle-label {
+      font-size: 14px;
+      color: #374151;
+    }
+    
+    select {
+      padding: 8px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 14px;
+      background-color: white;
+      color: #374151;
+      min-width: 120px;
+    }
+    
+    select:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .status {
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      display: none;
+    }
+    
+    .status.success {
+      background-color: #d1fae5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+    
+    .status.error {
+      background-color: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fca5a5;
+    }
+    
+    .footer {
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid #e5e7eb;
+      font-size: 12px;
+      color: #6b7280;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>CookieLens Settings</h1>
+    
+    <div class="setting-group">
+      <label class="setting-label" for="autoDetect">Auto-Detection</label>
+      <div class="setting-description">
+        Automatically show explanation modal when cookie banners are detected, without needing to click "Accept" first.
+      </div>
+      <div class="toggle-container">
+        <label class="toggle">
+          <input type="checkbox" id="autoDetect">
+          <span class="toggle-slider"></span>
+        </label>
+        <span class="toggle-label">Enable auto-detection</span>
+      </div>
+    </div>
+    
+    <div class="setting-group">
+      <label class="setting-label" for="blockNonEssential">Default Behavior</label>
+      <div class="setting-description">
+        When you click "Reject non-essential" on a cookie banner, this will automatically block analytics and marketing cookies on future visits to the same site.
+      </div>
+      <div class="toggle-container">
+        <label class="toggle">
+          <input type="checkbox" id="blockNonEssential">
+          <span class="toggle-slider"></span>
+        </label>
+        <span class="toggle-label">Enable automatic blocking</span>
+      </div>
+    </div>
+    
+    <div class="setting-group">
+      <label class="setting-label" for="language">Language</label>
+      <div class="setting-description">
+        Choose your preferred language for the extension interface. Currently, only English is supported.
+      </div>
+      <select id="language">
+        <option value="auto">Auto (English)</option>
+        <option value="en">English</option>
+        <option value="zh">中文 (简体)</option>
+      </select>
+    </div>
+    
+    <div id="status" class="status"></div>
+    
+    <div class="footer">
+      <p>CookieLens v1.0.0 | Made with ❤️ for privacy</p>
+    </div>
+  </div>
+  
+  <script src="options.js"></script>
+</body>
+</html>
