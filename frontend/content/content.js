@@ -373,6 +373,88 @@
         margin: 4px 0;
       }
       
+      .cookielens-loading-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 2147483648;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      }
+      
+      .cookielens-loading-content {
+        background: white;
+        border-radius: 16px;
+        padding: 32px;
+        max-width: 400px;
+        width: 90%;
+        text-align: center;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      }
+      
+      .cookielens-loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #e5e7eb;
+        border-top: 4px solid #3b82f6;
+        border-radius: 50%;
+        animation: cookielens-spin 1s linear infinite;
+        margin: 0 auto 20px;
+      }
+      
+      @keyframes cookielens-spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      .cookielens-loading-content h3 {
+        margin: 0 0 8px 0;
+        font-size: 20px;
+        font-weight: 600;
+        color: #1f2937;
+      }
+      
+      .cookielens-loading-url {
+        margin: 0 0 24px 0;
+        font-size: 14px;
+        color: #6b7280;
+        word-break: break-all;
+      }
+      
+      .cookielens-loading-steps {
+        margin-bottom: 20px;
+      }
+      
+      .cookielens-step {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 12px 0;
+        font-size: 14px;
+        color: #374151;
+      }
+      
+      .cookielens-step-icon {
+        margin-right: 8px;
+        font-size: 16px;
+      }
+      
+      .cookielens-step-text {
+        font-weight: 500;
+      }
+      
+      .cookielens-loading-note {
+        margin: 0;
+        font-size: 12px;
+        color: #9ca3af;
+        font-style: italic;
+      }
+      
       .cookielens-modal-header {
         margin-bottom: 20px;
       }
@@ -515,7 +597,10 @@
     // Update UI for scanning
     scanButton.disabled = true;
     scanButton.textContent = 'Analyzing...';
-    showStatus(statusDiv, 'Analyzing website privacy...', 'info');
+    showStatus(statusDiv, 'Starting analysis...', 'info');
+    
+    // Show loading modal
+    showLoadingModal(shadowRoot, url);
     
     console.log('CookieLens: Scanning website:', url);
     
@@ -537,6 +622,9 @@
     })
     .then(data => {
       console.log('CookieLens: Scan completed:', data);
+      
+      // Hide loading modal and show results
+      hideLoadingModal(shadowRoot);
       showStatus(statusDiv, 'Analysis completed successfully!', 'success');
       
       // Show results with human-readable analysis
@@ -545,11 +633,14 @@
     })
     .catch(error => {
       console.error('CookieLens: Scan failed:', error);
-      showStatus(statusDiv, `Scan failed: ${error.message}`, 'error');
+      
+      // Hide loading modal on error
+      hideLoadingModal(shadowRoot);
+      showStatus(statusDiv, `Analysis failed: ${error.message}`, 'error');
     })
     .finally(() => {
       scanButton.disabled = false;
-      scanButton.textContent = 'Scan Website';
+      scanButton.textContent = 'Analyze This Site';
     });
   }
   
@@ -637,6 +728,44 @@
       // Regular paragraph
       return `<p>${paragraph}</p>`;
     }).join('');
+  }
+  
+  function showLoadingModal(shadowRoot, url) {
+    // Create loading modal
+    const loadingHTML = `
+      <div class="cookielens-loading-modal">
+        <div class="cookielens-loading-content">
+          <div class="cookielens-loading-spinner"></div>
+          <h3>Analyzing Website Privacy</h3>
+          <p class="cookielens-loading-url">${url}</p>
+          <div class="cookielens-loading-steps">
+            <div class="cookielens-step">
+              <span class="cookielens-step-icon">🌐</span>
+              <span class="cookielens-step-text">Scanning website...</span>
+            </div>
+            <div class="cookielens-step">
+              <span class="cookielens-step-icon">🍪</span>
+              <span class="cookielens-step-text">Analyzing cookies...</span>
+            </div>
+            <div class="cookielens-step">
+              <span class="cookielens-step-icon">🤖</span>
+              <span class="cookielens-step-text">AI analysis in progress...</span>
+            </div>
+          </div>
+          <p class="cookielens-loading-note">This may take 10-30 seconds</p>
+        </div>
+      </div>
+    `;
+    
+    // Add loading modal to shadow root
+    shadowRoot.innerHTML += loadingHTML;
+  }
+  
+  function hideLoadingModal(shadowRoot) {
+    const loadingModal = shadowRoot.querySelector('.cookielens-loading-modal');
+    if (loadingModal) {
+      loadingModal.remove();
+    }
   }
   
   function downloadScanResults(data) {
