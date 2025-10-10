@@ -600,6 +600,102 @@
         font-style: italic;
       }
       
+      .cookielens-progress-container {
+        margin: 20px 0;
+      }
+      
+      .cookielens-progress-bar {
+        width: 100%;
+        height: 8px;
+        background-color: #e5e7eb;
+        border-radius: 4px;
+        overflow: hidden;
+        margin-bottom: 8px;
+      }
+      
+      .cookielens-progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+        border-radius: 4px;
+        width: 0%;
+        transition: width 0.5s ease;
+      }
+      
+      .cookielens-progress-text {
+        text-align: center;
+        font-size: 14px;
+        font-weight: 500;
+        color: #374151;
+      }
+      
+      .cookielens-step-status {
+        margin-left: auto;
+        font-size: 16px;
+        transition: all 0.3s ease;
+      }
+      
+      .cookielens-log-container {
+        margin: 20px 0;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        overflow: hidden;
+      }
+      
+      .cookielens-log-header {
+        background-color: #f9fafb;
+        padding: 12px 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #e5e7eb;
+      }
+      
+      .cookielens-log-header span {
+        font-size: 14px;
+        font-weight: 600;
+        color: #374151;
+      }
+      
+      .cookielens-log-toggle {
+        background-color: #3b82f6;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
+      
+      .cookielens-log-toggle:hover {
+        background-color: #2563eb;
+      }
+      
+      .cookielens-log-content {
+        background-color: #1f2937;
+        color: #f9fafb;
+        max-height: 200px;
+        overflow-y: auto;
+      }
+      
+      .cookielens-log-messages {
+        padding: 12px;
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        font-size: 12px;
+        line-height: 1.4;
+      }
+      
+      .cookielens-log-message {
+        margin: 4px 0;
+        padding: 2px 0;
+        border-bottom: 1px solid #374151;
+      }
+      
+      .cookielens-log-message:last-child {
+        border-bottom: none;
+      }
+      
       .cookielens-modal-header {
         margin-bottom: 20px;
       }
@@ -772,17 +868,23 @@
     
     console.log('CookieLens: Scanning website:', url);
     
-    // Call Lambda API
-    fetch('https://kr9knqhdha.execute-api.us-east-1.amazonaws.com/prod/scan', {
+    // Add initial log messages
+    addLogMessage(shadowRoot, '🚀 Sending request to backend API...');
+    addLogMessage(shadowRoot, `📡 Target URL: ${url}`);
+    
+    // Call local backend API
+    fetch('http://localhost:8000/scan-with-compliance', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        url: url
+        web_link: url
       })
     })
     .then(response => {
+      addLogMessage(shadowRoot, `📊 Response received: ${response.status} ${response.statusText}`);
+      
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -790,6 +892,10 @@
     })
     .then(data => {
       console.log('CookieLens: Scan completed:', data);
+      
+      addLogMessage(shadowRoot, '✅ Analysis completed successfully!');
+      addLogMessage(shadowRoot, `📋 Found ${data.scan_results?.cookies?.length || 0} cookies`);
+      addLogMessage(shadowRoot, `🔗 Detected ${data.scan_results?.thirdParties?.length || 0} third-party services`);
       
       // Hide loading modal and show results
       hideLoadingModal(shadowRoot);
@@ -801,6 +907,8 @@
     })
     .catch(error => {
       console.error('CookieLens: Scan failed:', error);
+      
+      addLogMessage(shadowRoot, `❌ Error: ${error.message}`);
       
       // Hide loading modal on error
       hideLoadingModal(shadowRoot);
@@ -826,8 +934,12 @@
   }
   
   function showScanResults(shadowRoot, data) {
-    // Extract data from Lambda API response
-    const scanResults = data;
+    // Extract data from compliance API response
+    const scanResults = data.scan_results || data;
+    const complianceAnalysis = data.compliance_analysis || {};
+    const thirdPartyRisks = data.third_party_risks || [];
+    const overallSummary = data.overall_summary || {};
+    
     const analysis = scanResults.humanReadableAnalysis || 'No analysis available';
     const url = scanResults.url || 'Unknown URL';
     const scannedAt = scanResults.scannedAt || new Date().toISOString();
@@ -852,6 +964,18 @@
             ${formatAnalysisText(analysis)}
           </div>
         </div>
+        
+        ${Object.keys(complianceAnalysis).length > 0 ? `
+        <div class="cookielens-compliance-section">
+          <div class="cookielens-compliance-header" id="cookielens-compliance-toggle">
+            <h4>Compliance Analysis</h4>
+            <span class="cookielens-expand-icon">▼</span>
+          </div>
+          <div class="cookielens-compliance-content" id="cookielens-compliance-content" style="display: none;">
+            ${formatComplianceAnalysis(complianceAnalysis, overallSummary)}
+          </div>
+        </div>
+        ` : ''}
         
         <div class="cookielens-compliance-section">
           <div class="cookielens-compliance-header" id="cookielens-cookies-toggle">
@@ -910,6 +1034,9 @@
     });
     
     // Add toggle functionality for all sections
+    if (Object.keys(complianceAnalysis).length > 0) {
+      addToggleFunctionality(shadowRoot, 'cookielens-compliance-toggle', 'cookielens-compliance-content');
+    }
     addToggleFunctionality(shadowRoot, 'cookielens-cookies-toggle', 'cookielens-cookies-content');
     addToggleFunctionality(shadowRoot, 'cookielens-thirdparties-toggle', 'cookielens-thirdparties-content');
     if (limitations.length > 0) {
@@ -941,6 +1068,89 @@
       // Regular paragraph
       return `<p>${paragraph}</p>`;
     }).join('');
+  }
+  
+  function formatComplianceAnalysis(complianceAnalysis, overallSummary) {
+    if (!complianceAnalysis || Object.keys(complianceAnalysis).length === 0) {
+      return '<p>No compliance analysis available.</p>';
+    }
+    
+    let html = '';
+    
+    // Overall summary
+    if (overallSummary && Object.keys(overallSummary).length > 0) {
+      html += `
+        <div class="cookielens-framework-section">
+          <h5 style="margin: 0 0 12px 0; color: #1f2937;">Overall Compliance Summary</h5>
+          <div style="background-color: #f0f9ff; border: 1px solid #bae6fd; border-radius: 6px; padding: 12px; margin-bottom: 16px;">
+            <p style="margin: 0; font-size: 14px; color: #1e40af;">
+              <strong>Overall Score:</strong> ${overallSummary.overall_score || 0}%<br>
+              <strong>Frameworks Analyzed:</strong> ${overallSummary.frameworks_analyzed || 0}<br>
+              <strong>Passed Controls:</strong> ${overallSummary.total_passed || 0}<br>
+              <strong>Failed Controls:</strong> ${overallSummary.total_failed || 0}<br>
+              <strong>Warnings:</strong> ${overallSummary.total_warnings || 0}
+            </p>
+          </div>
+        </div>
+      `;
+    }
+    
+    // Individual framework analysis
+    Object.entries(complianceAnalysis).forEach(([framework, analysis]) => {
+      const statusColor = analysis.status === 'compliant' ? '#10b981' : 
+                         analysis.status === 'needs_improvement' ? '#f59e0b' : '#ef4444';
+      const statusText = analysis.status === 'compliant' ? '✅ Compliant' :
+                        analysis.status === 'needs_improvement' ? '⚠️ Needs Improvement' : '❌ Non-Compliant';
+      
+      html += `
+        <div class="cookielens-framework-section">
+          <div class="cookielens-framework-header">
+            <h5>${analysis.framework || framework.toUpperCase()}</h5>
+            <span class="cookielens-status-badge" style="background-color: ${statusColor}; color: white;">
+              ${statusText} (${analysis.score || 0}%)
+            </span>
+          </div>
+          
+          ${analysis.passed_controls && analysis.passed_controls.length > 0 ? `
+          <div class="cookielens-controls-section">
+            <h6 style="color: #10b981;">✅ Passed Controls</h6>
+            <ul class="cookielens-controls-list">
+              ${analysis.passed_controls.map(control => `<li style="color: #065f46;">${control}</li>`).join('')}
+            </ul>
+          </div>
+          ` : ''}
+          
+          ${analysis.failed_controls && analysis.failed_controls.length > 0 ? `
+          <div class="cookielens-controls-section">
+            <h6 style="color: #ef4444;">❌ Failed Controls</h6>
+            <ul class="cookielens-controls-list">
+              ${analysis.failed_controls.map(control => `<li style="color: #991b1b;">${control}</li>`).join('')}
+            </ul>
+          </div>
+          ` : ''}
+          
+          ${analysis.warnings && analysis.warnings.length > 0 ? `
+          <div class="cookielens-controls-section">
+            <h6 style="color: #f59e0b;">⚠️ Warnings</h6>
+            <ul class="cookielens-controls-list">
+              ${analysis.warnings.map(warning => `<li style="color: #92400e;">${warning}</li>`).join('')}
+            </ul>
+          </div>
+          ` : ''}
+          
+          ${analysis.recommendations && analysis.recommendations.length > 0 ? `
+          <div class="cookielens-recommendations-section">
+            <h6 style="color: #1e40af; margin: 0 0 8px 0;">💡 Recommendations</h6>
+            <ul class="cookielens-controls-list">
+              ${analysis.recommendations.map(rec => `<li style="color: #1e40af;">${rec}</li>`).join('')}
+            </ul>
+          </div>
+          ` : ''}
+        </div>
+      `;
+    });
+    
+    return html;
   }
   
   function formatCookiesAnalysis(cookies) {
@@ -1058,44 +1268,155 @@
   }
   
   function showLoadingModal(shadowRoot, url) {
-    // Create loading modal
+    // Create enhanced loading modal with progress tracking
     const loadingHTML = `
       <div class="cookielens-loading-modal">
         <div class="cookielens-loading-content">
           <div class="cookielens-loading-spinner"></div>
-          <h3>Analyzing Website Privacy</h3>
+          <h3>🔍 Analyzing Website Privacy & Compliance</h3>
           <p class="cookielens-loading-url">${url}</p>
+          
+          <div class="cookielens-progress-container">
+            <div class="cookielens-progress-bar">
+              <div class="cookielens-progress-fill" id="cookielens-progress-fill"></div>
+            </div>
+            <div class="cookielens-progress-text" id="cookielens-progress-text">Initializing...</div>
+          </div>
+          
           <div class="cookielens-loading-steps">
-            <div class="cookielens-step">
+            <div class="cookielens-step" id="step-1">
               <span class="cookielens-step-icon">🌐</span>
-              <span class="cookielens-step-text">Scanning website...</span>
+              <span class="cookielens-step-text">Connecting to website...</span>
+              <span class="cookielens-step-status">⏳</span>
             </div>
-            <div class="cookielens-step">
+            <div class="cookielens-step" id="step-2">
               <span class="cookielens-step-icon">🍪</span>
-              <span class="cookielens-step-text">Analyzing cookies...</span>
+              <span class="cookielens-step-text">Scanning cookies & storage...</span>
+              <span class="cookielens-step-status">⏳</span>
             </div>
-            <div class="cookielens-step">
+            <div class="cookielens-step" id="step-3">
+              <span class="cookielens-step-icon">🔗</span>
+              <span class="cookielens-step-text">Detecting third-party services...</span>
+              <span class="cookielens-step-status">⏳</span>
+            </div>
+            <div class="cookielens-step" id="step-4">
               <span class="cookielens-step-icon">🤖</span>
               <span class="cookielens-step-text">AI privacy analysis...</span>
+              <span class="cookielens-step-status">⏳</span>
             </div>
-            <div class="cookielens-step">
+            <div class="cookielens-step" id="step-5">
               <span class="cookielens-step-icon">⚖️</span>
               <span class="cookielens-step-text">Compliance checking...</span>
+              <span class="cookielens-step-status">⏳</span>
+            </div>
+            <div class="cookielens-step" id="step-6">
+              <span class="cookielens-step-icon">📊</span>
+              <span class="cookielens-step-text">Generating report...</span>
+              <span class="cookielens-step-status">⏳</span>
             </div>
           </div>
-          <p class="cookielens-loading-note">This may take 10-30 seconds</p>
+          
+          <div class="cookielens-log-container">
+            <div class="cookielens-log-header">
+              <span>📋 Backend Logs</span>
+              <button class="cookielens-log-toggle" id="cookielens-log-toggle">Show</button>
+            </div>
+            <div class="cookielens-log-content" id="cookielens-log-content" style="display: none;">
+              <div class="cookielens-log-messages" id="cookielens-log-messages">
+                <div class="cookielens-log-message">🚀 Starting analysis...</div>
+              </div>
+            </div>
+          </div>
+          
+          <p class="cookielens-loading-note">⏱️ This may take 15-45 seconds depending on website complexity</p>
         </div>
       </div>
     `;
     
     // Add loading modal to shadow root
     shadowRoot.innerHTML += loadingHTML;
+    
+    // Start progress animation
+    startProgressAnimation(shadowRoot);
+    
+    // Setup log toggle
+    setupLogToggle(shadowRoot);
   }
   
   function hideLoadingModal(shadowRoot) {
     const loadingModal = shadowRoot.querySelector('.cookielens-loading-modal');
     if (loadingModal) {
       loadingModal.remove();
+    }
+  }
+  
+  function startProgressAnimation(shadowRoot) {
+    const progressFill = shadowRoot.getElementById('cookielens-progress-fill');
+    const progressText = shadowRoot.getElementById('cookielens-progress-text');
+    const steps = [
+      { text: 'Connecting to website...', progress: 10 },
+      { text: 'Scanning cookies & storage...', progress: 25 },
+      { text: 'Detecting third-party services...', progress: 40 },
+      { text: 'AI privacy analysis...', progress: 65 },
+      { text: 'Compliance checking...', progress: 85 },
+      { text: 'Generating report...', progress: 95 }
+    ];
+    
+    let currentStep = 0;
+    
+    const updateProgress = () => {
+      if (currentStep < steps.length) {
+        const step = steps[currentStep];
+        progressFill.style.width = step.progress + '%';
+        progressText.textContent = step.text;
+        
+        // Update step status
+        const stepElement = shadowRoot.getElementById(`step-${currentStep + 1}`);
+        if (stepElement) {
+          const statusSpan = stepElement.querySelector('.cookielens-step-status');
+          if (statusSpan) {
+            statusSpan.textContent = '✅';
+            statusSpan.style.color = '#10b981';
+          }
+        }
+        
+        // Add log message
+        addLogMessage(shadowRoot, `✅ ${step.text}`);
+        
+        currentStep++;
+        
+        // Schedule next update
+        setTimeout(updateProgress, 2000 + Math.random() * 3000); // 2-5 seconds between steps
+      }
+    };
+    
+    // Start the animation
+    setTimeout(updateProgress, 1000);
+  }
+  
+  function setupLogToggle(shadowRoot) {
+    const toggle = shadowRoot.getElementById('cookielens-log-toggle');
+    const content = shadowRoot.getElementById('cookielens-log-content');
+    
+    if (toggle && content) {
+      toggle.addEventListener('click', () => {
+        const isVisible = content.style.display !== 'none';
+        content.style.display = isVisible ? 'none' : 'block';
+        toggle.textContent = isVisible ? 'Show' : 'Hide';
+      });
+    }
+  }
+  
+  function addLogMessage(shadowRoot, message) {
+    const logMessages = shadowRoot.getElementById('cookielens-log-messages');
+    if (logMessages) {
+      const messageDiv = document.createElement('div');
+      messageDiv.className = 'cookielens-log-message';
+      messageDiv.textContent = `${new Date().toLocaleTimeString()} - ${message}`;
+      logMessages.appendChild(messageDiv);
+      
+      // Auto-scroll to bottom
+      logMessages.scrollTop = logMessages.scrollHeight;
     }
   }
   

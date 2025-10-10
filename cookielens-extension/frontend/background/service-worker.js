@@ -51,14 +51,14 @@ async function handleWebsiteScan(url, sendResponse) {
   console.log('Background script: Scanning website:', url);
   
   try {
-    const LAMBDA_API_URL = 'https://kr9knqhdha.execute-api.us-east-1.amazonaws.com/prod/scan';
+    const LOCAL_API_URL = 'http://localhost:8000/scan-with-compliance';
     
-    const response = await fetch(LAMBDA_API_URL, {
+    const response = await fetch(LOCAL_API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ url: url })
+      body: JSON.stringify({ web_link: url })
     });
     
     console.log('Background script: API response status:', response.status);
