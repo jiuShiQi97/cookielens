@@ -319,22 +319,61 @@
         text-align: center;
       }
       
-      .cookielens-result-content {
-        background-color: #f9fafb;
+      .cookielens-analysis-header {
+        background-color: #f3f4f6;
         border: 1px solid #e5e7eb;
         border-radius: 6px;
         padding: 12px;
         margin-bottom: 16px;
-        max-height: 300px;
+      }
+      
+      .cookielens-analysis-info {
+        font-size: 13px;
+        color: #374151;
+        line-height: 1.5;
+      }
+      
+      .cookielens-analysis-content {
+        background-color: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        padding: 16px;
+        margin-bottom: 16px;
+        max-height: 400px;
         overflow-y: auto;
       }
       
-      .cookielens-result-content pre {
-        margin: 0;
-        font-size: 12px;
-        line-height: 1.4;
-        white-space: pre-wrap;
-        word-wrap: break-word;
+      .cookielens-analysis-content h4 {
+        margin: 0 0 12px 0;
+        color: #1f2937;
+        font-size: 16px;
+        font-weight: 600;
+      }
+      
+      .cookielens-analysis-content h5 {
+        margin: 16px 0 8px 0;
+        color: #374151;
+        font-size: 14px;
+        font-weight: 600;
+      }
+      
+      .cookielens-analysis-text {
+        font-size: 13px;
+        line-height: 1.6;
+        color: #374151;
+      }
+      
+      .cookielens-analysis-text p {
+        margin: 0 0 12px 0;
+      }
+      
+      .cookielens-analysis-text ul {
+        margin: 8px 0;
+        padding-left: 20px;
+      }
+      
+      .cookielens-analysis-text li {
+        margin: 4px 0;
       }
       
       .cookielens-modal-header {
@@ -407,7 +446,7 @@
         <div class="cookielens-modal-content">
           <div class="cookielens-modal-header">
             <h2 class="cookielens-modal-title">CookieLens Scanner</h2>
-            <p class="cookielens-modal-description">Enter a website URL to scan for privacy analysis</p>
+            <p class="cookielens-modal-description">Enter a website URL to analyze privacy and cookie usage</p>
           </div>
           
           <div class="cookielens-input-section">
@@ -418,7 +457,7 @@
           
           <div class="cookielens-buttons">
             <button class="cookielens-button cookielens-button-primary" id="cookielens-scan">
-              Scan Website
+              Analyze Privacy
             </button>
             <button class="cookielens-button cookielens-button-secondary" id="cookielens-close">
               Close
@@ -478,8 +517,8 @@
     
     // Update UI for scanning
     scanButton.disabled = true;
-    scanButton.textContent = 'Scanning...';
-    showStatus(statusDiv, 'Scanning website...', 'info');
+    scanButton.textContent = 'Analyzing...';
+    showStatus(statusDiv, 'Analyzing website privacy...', 'info');
     
     console.log('CookieLens: Scanning website:', url);
     
@@ -501,9 +540,9 @@
     })
     .then(data => {
       console.log('CookieLens: Scan completed:', data);
-      showStatus(statusDiv, 'Scan completed successfully!', 'success');
+      showStatus(statusDiv, 'Analysis completed successfully!', 'success');
       
-      // Show results
+      // Show results with human-readable analysis
       showScanResults(shadowRoot, data);
       
     })
@@ -531,16 +570,30 @@
   }
   
   function showScanResults(shadowRoot, data) {
-    // Create results modal
+    // Extract humanReadableAnalysis from response
+    const analysis = data.humanReadableAnalysis || 'No analysis available';
+    const url = data.url || 'Unknown URL';
+    const scannedAt = data.scannedAt || new Date().toISOString();
+    
+    // Create results modal with human-readable analysis
     const resultsHTML = `
       <div class="cookielens-results">
-        <h3>Scan Results</h3>
-        <div class="cookielens-result-content">
-          <pre>${JSON.stringify(data, null, 2)}</pre>
+        <h3>Privacy Analysis Report</h3>
+        <div class="cookielens-analysis-header">
+          <div class="cookielens-analysis-info">
+            <strong>Website:</strong> ${url}<br>
+            <strong>Scanned:</strong> ${new Date(scannedAt).toLocaleString()}
+          </div>
+        </div>
+        <div class="cookielens-analysis-content">
+          <h4>Analysis Summary</h4>
+          <div class="cookielens-analysis-text">
+            ${formatAnalysisText(analysis)}
+          </div>
         </div>
         <div class="cookielens-buttons">
           <button class="cookielens-button cookielens-button-primary" id="cookielens-download-results">
-            Download Results
+            Download Full Report
           </button>
           <button class="cookielens-button cookielens-button-secondary" id="cookielens-close-results">
             Close
@@ -561,6 +614,32 @@
     shadowRoot.getElementById('cookielens-close-results').addEventListener('click', () => {
       closeModal();
     });
+  }
+  
+  function formatAnalysisText(analysis) {
+    // Format the analysis text for better readability
+    if (!analysis) return '<p>No analysis available.</p>';
+    
+    // Split by common patterns and format as paragraphs
+    const paragraphs = analysis
+      .split(/\n\s*\n/) // Split by double newlines
+      .filter(p => p.trim().length > 0)
+      .map(p => p.trim());
+    
+    return paragraphs.map(paragraph => {
+      // Check if it's a header (starts with ** or contains :)
+      if (paragraph.startsWith('**') && paragraph.endsWith('**')) {
+        return `<h5>${paragraph.replace(/\*\*/g, '')}</h5>`;
+      }
+      
+      // Check if it's a list item
+      if (paragraph.match(/^\d+\.|^[-*]/)) {
+        return `<ul><li>${paragraph.replace(/^\d+\.\s*|^[-*]\s*/, '')}</li></ul>`;
+      }
+      
+      // Regular paragraph
+      return `<p>${paragraph}</p>`;
+    }).join('');
   }
   
   function downloadScanResults(data) {
