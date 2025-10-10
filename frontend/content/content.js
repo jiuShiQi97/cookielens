@@ -18,10 +18,10 @@
     // Use event delegation to catch clicks on potential cookie banner buttons
     document.addEventListener('click', handlePotentialCookieBannerClick, true);
     
-    // Auto-detect cookie banners on page load
+    // Auto-show modal on page load
     autoDetectCookieBanner();
     
-    console.log('CookieLens: Banner detection initialized');
+    console.log('CookieLens: Privacy analysis initialized');
   }
   
   async function checkModalStatus() {
@@ -58,7 +58,7 @@
     currentTarget = target;
     originalClickHandler = target.onclick;
     
-    // Show our modal
+    // Show our modal (backup method if auto-show fails)
     showExplanationModal();
   }
   
@@ -108,7 +108,7 @@
     return false;
   }
   
-  // Auto-detect cookie banners on page load
+  // Auto-show modal on page load
   async function autoDetectCookieBanner() {
     if (modalShown) return;
     
@@ -124,14 +124,11 @@
       return;
     }
     
-    // Wait a bit for page to fully load
+    // Wait a bit for page to fully load, then show modal automatically
     setTimeout(() => {
-      const cookieBanner = findCookieBanner();
-      if (cookieBanner) {
-        console.log('CookieLens: Auto-detected cookie banner');
-        showExplanationModal();
-      }
-    }, 2000); // Wait 2 seconds for banners to appear
+      console.log('CookieLens: Auto-showing privacy analysis modal');
+      showExplanationModal();
+    }, 2000); // Wait 2 seconds for page to load
   }
   
   // Find cookie banner container
@@ -445,8 +442,8 @@
       <div class="cookielens-modal">
         <div class="cookielens-modal-content">
           <div class="cookielens-modal-header">
-            <h2 class="cookielens-modal-title">CookieLens Scanner</h2>
-            <p class="cookielens-modal-description">Enter a website URL to analyze privacy and cookie usage</p>
+            <h2 class="cookielens-modal-title">Privacy Analysis</h2>
+            <p class="cookielens-modal-description">Analyze this website's privacy and cookie usage</p>
           </div>
           
           <div class="cookielens-input-section">
@@ -457,7 +454,7 @@
           
           <div class="cookielens-buttons">
             <button class="cookielens-button cookielens-button-primary" id="cookielens-scan">
-              Analyze Privacy
+              Analyze This Site
             </button>
             <button class="cookielens-button cookielens-button-secondary" id="cookielens-close">
               Close
