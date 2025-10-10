@@ -256,11 +256,85 @@
         background: white;
         border-radius: 12px;
         padding: 24px;
-        max-width: 320px;
+        max-width: 420px;
         width: 90%;
         box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         position: relative;
         text-align: center;
+      }
+      
+      .cookielens-input-section {
+        margin: 16px 0;
+      }
+      
+      .cookielens-url-input {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 14px;
+        font-family: inherit;
+        box-sizing: border-box;
+      }
+      
+      .cookielens-url-input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      }
+      
+      .cookielens-status {
+        margin-top: 8px;
+        padding: 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        display: none;
+      }
+      
+      .cookielens-status-info {
+        background-color: #dbeafe;
+        color: #1e40af;
+        border: 1px solid #93c5fd;
+      }
+      
+      .cookielens-status-success {
+        background-color: #d1fae5;
+        color: #065f46;
+        border: 1px solid #a7f3d0;
+      }
+      
+      .cookielens-status-error {
+        background-color: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fca5a5;
+      }
+      
+      .cookielens-results {
+        text-align: left;
+      }
+      
+      .cookielens-results h3 {
+        margin: 0 0 16px 0;
+        color: #1f2937;
+        text-align: center;
+      }
+      
+      .cookielens-result-content {
+        background-color: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        padding: 12px;
+        margin-bottom: 16px;
+        max-height: 300px;
+        overflow-y: auto;
+      }
+      
+      .cookielens-result-content pre {
+        margin: 0;
+        font-size: 12px;
+        line-height: 1.4;
+        white-space: pre-wrap;
+        word-wrap: break-word;
       }
       
       .cookielens-modal-header {
@@ -332,13 +406,19 @@
       <div class="cookielens-modal">
         <div class="cookielens-modal-content">
           <div class="cookielens-modal-header">
-            <h2 class="cookielens-modal-title">Cookie Info Summary</h2>
-            <p class="cookielens-modal-description">Cookie policy extracted and saved locally</p>
+            <h2 class="cookielens-modal-title">CookieLens Scanner</h2>
+            <p class="cookielens-modal-description">Enter a website URL to scan for privacy analysis</p>
+          </div>
+          
+          <div class="cookielens-input-section">
+            <input type="url" id="cookielens-url-input" class="cookielens-url-input" 
+                   placeholder="https://example.com" value="${window.location.href}">
+            <div class="cookielens-status" id="cookielens-status"></div>
           </div>
           
           <div class="cookielens-buttons">
-            <button class="cookielens-button cookielens-button-primary" id="cookielens-extract">
-              Extract Policy
+            <button class="cookielens-button cookielens-button-primary" id="cookielens-scan">
+              Scan Website
             </button>
             <button class="cookielens-button cookielens-button-secondary" id="cookielens-close">
               Close
@@ -350,14 +430,21 @@
   }
   
   function setupModalEventListeners(shadowRoot) {
-    // Extract policy button
-    shadowRoot.getElementById('cookielens-extract').addEventListener('click', () => {
-      extractCookiePolicy();
+    // Scan button
+    shadowRoot.getElementById('cookielens-scan').addEventListener('click', () => {
+      scanWebsite(shadowRoot);
     });
     
     // Close button
     shadowRoot.getElementById('cookielens-close').addEventListener('click', () => {
       closeModal();
+    });
+    
+    // Enter key support for URL input
+    shadowRoot.getElementById('cookielens-url-input').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        scanWebsite(shadowRoot);
+      }
     });
     
     // Close on backdrop click
@@ -369,143 +456,131 @@
   }
   
   
-  function extractCookiePolicy() {
-    console.log('CookieLens: Extracting cookie policy...');
+  function scanWebsite(shadowRoot) {
+    const urlInput = shadowRoot.getElementById('cookielens-url-input');
+    const statusDiv = shadowRoot.getElementById('cookielens-status');
+    const scanButton = shadowRoot.getElementById('cookielens-scan');
     
+    const url = urlInput.value.trim();
+    
+    if (!url) {
+      showStatus(statusDiv, 'Please enter a valid URL', 'error');
+      return;
+    }
+    
+    // Validate URL format
     try {
-      // Extract cookie policy information
-      const policyData = {
-        url: window.location.href,
-        domain: window.location.hostname,
-        timestamp: new Date().toISOString(),
-        cookies: extractCookies(),
-        scripts: extractScripts(),
-        policyLinks: findPolicyLinks(),
-        bannerText: extractBannerText()
-      };
-      
-      // Save to local storage
-      savePolicyToLocal(policyData);
-      
-      // Download as JSON file
-      downloadPolicyFile(policyData);
-      
-      console.log('CookieLens: Policy extracted successfully', policyData);
-      
-    } catch (error) {
-      console.error('CookieLens: Failed to extract policy:', error);
+      new URL(url);
+    } catch (e) {
+      showStatus(statusDiv, 'Invalid URL format', 'error');
+      return;
     }
-  }
-  
-  function extractCookies() {
-    const cookies = [];
-    if (document.cookie) {
-      const cookieStrings = document.cookie.split(';');
-      cookieStrings.forEach(cookie => {
-        const [name, value] = cookie.trim().split('=');
-        if (name) {
-          cookies.push({
-            name: name.trim(),
-            value: value ? value.trim() : '',
-            domain: window.location.hostname
-          });
-        }
-      });
-    }
-    return cookies;
-  }
-  
-  function extractScripts() {
-    const scripts = [];
-    const scriptTags = document.querySelectorAll('script[src]');
-    scriptTags.forEach(script => {
-      try {
-        const url = new URL(script.src);
-        scripts.push({
-          src: script.src,
-          hostname: url.hostname,
-          domain: url.hostname
-        });
-      } catch (e) {
-        // Ignore invalid URLs
+    
+    // Update UI for scanning
+    scanButton.disabled = true;
+    scanButton.textContent = 'Scanning...';
+    showStatus(statusDiv, 'Scanning website...', 'info');
+    
+    console.log('CookieLens: Scanning website:', url);
+    
+    // Call backend API
+    fetch('http://localhost:8000/scan', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        web_link: url
+      })
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    });
-    return scripts;
-  }
-  
-  function findPolicyLinks() {
-    const policyLinks = [];
-    const links = document.querySelectorAll('a[href*="cookie"], a[href*="privacy"], a[href*="policy"]');
-    links.forEach(link => {
-      policyLinks.push({
-        text: link.textContent.trim(),
-        href: link.href,
-        title: link.title || ''
-      });
-    });
-    return policyLinks;
-  }
-  
-  function extractBannerText() {
-    const bannerTexts = [];
-    
-    // Look for cookie banner text
-    const cookieTextPatterns = [
-      'cookie', 'cookies', 'consent', 'privacy', 'gdpr',
-      'cookie', 'cookies', '同意', '隐私', '数据'
-    ];
-    
-    const allElements = document.querySelectorAll('*');
-    for (const element of allElements) {
-      const text = element.textContent.toLowerCase();
-      for (const pattern of cookieTextPatterns) {
-        if (text.includes(pattern) && isVisible(element)) {
-          const buttons = element.querySelectorAll('button');
-          if (buttons.length > 0) {
-            bannerTexts.push({
-              text: element.textContent.trim(),
-              buttons: Array.from(buttons).map(btn => btn.textContent.trim())
-            });
-            break;
-          }
-        }
-      }
-    }
-    
-    return bannerTexts;
-  }
-  
-  function savePolicyToLocal(policyData) {
-    try {
-      // Save to Chrome storage
-      chrome.storage.local.set({
-        [`cookiePolicy_${policyData.domain}_${Date.now()}`]: policyData
-      });
+      return response.json();
+    })
+    .then(data => {
+      console.log('CookieLens: Scan completed:', data);
+      showStatus(statusDiv, 'Scan completed successfully!', 'success');
       
-      console.log('CookieLens: Policy saved to Chrome storage');
-    } catch (error) {
-      console.error('CookieLens: Failed to save to storage:', error);
+      // Show results
+      showScanResults(shadowRoot, data);
+      
+    })
+    .catch(error => {
+      console.error('CookieLens: Scan failed:', error);
+      showStatus(statusDiv, `Scan failed: ${error.message}`, 'error');
+    })
+    .finally(() => {
+      scanButton.disabled = false;
+      scanButton.textContent = 'Scan Website';
+    });
+  }
+  
+  function showStatus(statusDiv, message, type) {
+    statusDiv.textContent = message;
+    statusDiv.className = `cookielens-status cookielens-status-${type}`;
+    statusDiv.style.display = 'block';
+    
+    // Auto-hide success messages after 3 seconds
+    if (type === 'success') {
+      setTimeout(() => {
+        statusDiv.style.display = 'none';
+      }, 3000);
     }
   }
   
-  function downloadPolicyFile(policyData) {
+  function showScanResults(shadowRoot, data) {
+    // Create results modal
+    const resultsHTML = `
+      <div class="cookielens-results">
+        <h3>Scan Results</h3>
+        <div class="cookielens-result-content">
+          <pre>${JSON.stringify(data, null, 2)}</pre>
+        </div>
+        <div class="cookielens-buttons">
+          <button class="cookielens-button cookielens-button-primary" id="cookielens-download-results">
+            Download Results
+          </button>
+          <button class="cookielens-button cookielens-button-secondary" id="cookielens-close-results">
+            Close
+          </button>
+        </div>
+      </div>
+    `;
+    
+    // Replace modal content
+    const modalContent = shadowRoot.querySelector('.cookielens-modal-content');
+    modalContent.innerHTML = resultsHTML;
+    
+    // Add event listeners for results
+    shadowRoot.getElementById('cookielens-download-results').addEventListener('click', () => {
+      downloadScanResults(data);
+    });
+    
+    shadowRoot.getElementById('cookielens-close-results').addEventListener('click', () => {
+      closeModal();
+    });
+  }
+  
+  function downloadScanResults(data) {
     try {
-      const blob = new Blob([JSON.stringify(policyData, null, 2)], {
+      const blob = new Blob([JSON.stringify(data, null, 2)], {
         type: 'application/json'
       });
       
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `cookie-policy-${policyData.domain}-${Date.now()}.json`;
+      a.download = `cookielens-scan-${Date.now()}.json`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
       
-      console.log('CookieLens: Policy file downloaded');
+      console.log('CookieLens: Scan results downloaded');
     } catch (error) {
-      console.error('CookieLens: Failed to download file:', error);
+      console.error('CookieLens: Failed to download scan results:', error);
     }
   }
   
