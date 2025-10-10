@@ -236,27 +236,53 @@
     return `
       .cookielens-modal {
         position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        bottom: 20px;
+        right: 20px;
+        width: 400px;
+        max-height: 80vh;
+        background-color: rgba(0, 0, 0, 0.8);
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
         z-index: 2147483647;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
       }
       
       .cookielens-modal-content {
         background: white;
         border-radius: 12px;
-        padding: 24px;
-        max-width: 420px;
-        width: 90%;
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        position: relative;
+        padding: 20px;
+        width: 100%;
+        max-height: 100%;
+        overflow-y: auto;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         text-align: center;
+        position: relative;
+      }
+      
+      .cookielens-close-btn {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        background: none;
+        border: none;
+        font-size: 24px;
+        font-weight: bold;
+        color: #6b7280;
+        cursor: pointer;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.2s;
+      }
+      
+      .cookielens-close-btn:hover {
+        background-color: #f3f4f6;
+        color: #374151;
       }
       
       .cookielens-input-section {
@@ -374,26 +400,28 @@
       
       .cookielens-loading-modal {
         position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
+        bottom: 20px;
+        right: 20px;
+        width: 400px;
+        max-height: 80vh;
         background-color: rgba(0, 0, 0, 0.8);
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
         z-index: 2147483648;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
       }
       
       .cookielens-loading-content {
         background: white;
-        border-radius: 16px;
-        padding: 32px;
-        max-width: 400px;
-        width: 90%;
-        text-align: center;
+        border-radius: 12px;
+        padding: 20px;
+        width: 100%;
+        max-height: 100%;
+        overflow-y: auto;
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        text-align: center;
       }
       
       .cookielens-loading-spinner {
@@ -510,9 +538,26 @@
       }
       
       @media (max-width: 480px) {
+        .cookielens-modal {
+          width: calc(100vw - 40px);
+          right: 20px;
+          left: 20px;
+          bottom: 20px;
+        }
+        
+        .cookielens-loading-modal {
+          width: calc(100vw - 40px);
+          right: 20px;
+          left: 20px;
+          bottom: 20px;
+        }
+        
         .cookielens-modal-content {
-          margin: 16px;
-          padding: 20px;
+          padding: 16px;
+        }
+        
+        .cookielens-loading-content {
+          padding: 16px;
         }
       }
     `;
@@ -522,6 +567,7 @@
     return `
       <div class="cookielens-modal">
         <div class="cookielens-modal-content">
+          <button class="cookielens-close-btn" id="cookielens-close-btn">×</button>
           <div class="cookielens-modal-header">
             <h2 class="cookielens-modal-title">Privacy Analysis</h2>
             <p class="cookielens-modal-description">Analyze this website's privacy and cookie usage</p>
@@ -557,6 +603,11 @@
       closeModal();
     });
     
+    // Close button (X)
+    shadowRoot.getElementById('cookielens-close-btn').addEventListener('click', () => {
+      closeModal();
+    });
+    
     // Enter key support for URL input
     shadowRoot.getElementById('cookielens-url-input').addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
@@ -564,12 +615,12 @@
       }
     });
     
-    // Close on backdrop click
-    shadowRoot.querySelector('.cookielens-modal').addEventListener('click', (e) => {
-      if (e.target.classList.contains('cookielens-modal')) {
-        closeModal();
-      }
-    });
+    // Close on backdrop click (disabled for corner modal)
+    // shadowRoot.querySelector('.cookielens-modal').addEventListener('click', (e) => {
+    //   if (e.target.classList.contains('cookielens-modal')) {
+    //     closeModal();
+    //   }
+    // });
   }
   
   
