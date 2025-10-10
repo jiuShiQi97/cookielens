@@ -6,6 +6,7 @@ from lambda_function import scan_website
 from vanta_client import VantaClient
 from compliance_analyzer import ComplianceAnalyzer
 import traceback
+from datetime import datetime
 
 app = FastAPI(title="CookieLens API", version="1.0.0")
 
@@ -89,21 +90,35 @@ def scan_with_compliance_endpoint(request: ScanWithComplianceRequest):
         # Convert HttpUrl to string
         url = str(request.web_link)
         
+        print("="*60)
+        print(f"🔍 Starting compliance analysis for: {url}")
+        print("="*60)
+        
         # Step 1: Scan the website
-        print(f"Scanning {url} for compliance analysis...")
+        print(f"📡 Step 1: Scanning website {url}...")
+        print(f"⏰ Started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         scan_results = scan_website(url)
+        print(f"✅ Website scan completed!")
+        print(f"🍪 Found {len(scan_results.get('cookies', []))} cookies")
+        print(f"🔗 Detected {len(scan_results.get('thirdParties', []))} third-party services")
         
         # Step 2: Analyze compliance
-        print(f"Analyzing compliance for frameworks: {request.frameworks or ['gdpr', 'ccpa']}")
+        frameworks = request.frameworks or ['gdpr', 'ccpa']
+        print(f"⚖️ Step 2: Analyzing compliance for frameworks: {frameworks}")
         compliance_results = compliance_analyzer.analyze_compliance(
             scan_results,
-            frameworks=request.frameworks
+            frameworks=frameworks
         )
+        
+        print(f"✅ Compliance analysis completed!")
+        print(f"📊 Overall score: {compliance_results.get('overall_summary', {}).get('overall_score', 0)}%")
+        print(f"⏰ Completed at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        print("="*60)
         
         return compliance_results
         
     except Exception as e:
-        print(f"Compliance scan error: {e}")
+        print(f"❌ Compliance scan error: {e}")
         print(traceback.format_exc())
         raise HTTPException(
             status_code=500,

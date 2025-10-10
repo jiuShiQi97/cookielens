@@ -13,6 +13,11 @@ playwright install chromium
 
 Start the FastAPI server:
 ```bash
+python start_server.py
+```
+
+Or run app.py directly:
+```bash
 python app.py
 ```
 

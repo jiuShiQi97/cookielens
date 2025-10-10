@@ -1,0 +1,644 @@
+{
+  "scan_results": {
+    "url": "https://www.yami.com/en",
+    "scannedAt": "2025-10-10T22:19:48.080270",
+    "cookies": [
+      {
+        "name": "ymb_track_visitor_id",
+        "value": "5bc1a59a-ba32-4ce5-a722-cb6da618c7cf",
+        "domain": ".yami.com",
+        "path": "/",
+        "expires": 1791670761.330716,
+        "httpOnly": false,
+        "secure": false,
+        "sameSite": "Lax"
+      },
+      {
+        "name": "YMB_TK",
+        "value": "eyJhdXRoIjoiODAzN2I4ZDcwMzdhMGYwM2Y4MWUyYWExM2E4ZDkwYjUiLCJkYXRhIjoiOWZlMzljZmItOWQ1My00YjJlLTg3MGMtYzE0NjBmYWJmYzIxIiwibm9uY2UiOiIzNjY2IiwidCI6MiwidHMiOjE3NjAxMzQ3NjEsInYiOjF9",
+        "domain": ".yami.com",
+        "path": "/",
+        "expires": 1762726761.331379,
+        "httpOnly": false,
+        "secure": false,
+        "sameSite": "Lax"
+      },
+      {
+        "name": "YMB_LANG",
+        "value": "en_US",
+        "domain": ".yami.com",
+        "path": "/",
+        "expires": 1760221167.430346,
+        "httpOnly": false,
+        "secure": false,
+        "sameSite": "Lax"
+      },
+      {
+        "name": "BrowserId",
+        "value": "LHsDuaYnEfCIDW16yM0pnw",
+        "domain": ".force.com",
+        "path": "/",
+        "expires": 1791670762.830894,
+        "httpOnly": false,
+        "secure": true,
+        "sameSite": "None"
+      },
+      {
+        "name": "_rdt_uuid",
+        "value": "1760134765945.5dd0b2fe-fbf8-4422-90e1-a3bdee555eb0",
+        "domain": ".yami.com",
+        "path": "/",
+        "expires": 1767910765,
+        "httpOnly": false,
+        "secure": true,
+        "sameSite": "Strict"
+      },
+      {
+        "name": "y_screen_dpi",
+        "value": "1",
+        "domain": ".yami.com",
+        "path": "/",
+        "expires": -1,
+        "httpOnly": false,
+        "secure": false,
+        "sameSite": "Lax"
+      },
+      {
+        "name": "APPLE_PAY_AVALID",
+        "value": "0",
+        "domain": ".yami.com",
+        "path": "/",
+        "expires": 1760221166,
+        "httpOnly": false,
+        "secure": false,
+        "sameSite": "Lax"
+      },
+      {
+        "name": "Y_TIME_ZONE",
+        "value": "-7",
+        "domain": ".yami.com",
+        "path": "/",
+        "expires": 1791670766,
+        "httpOnly": false,
+        "secure": false,
+        "sameSite": "Lax"
+      },
+      {
+        "name": "sajssdk_2015_cross_new_user",
+        "value": "1",
+        "domain": ".yami.com",
+        "path": "/",
+        "expires": 1760165999,
+        "httpOnly": false,
+        "secure": false,
+        "sameSite": "Lax"
+      },
+      {
+        "name": "sensorsdata2015jssdkcross",
+        "value": "%7B%22distinct_id%22%3A%22199d0351f01221-058d5b31ad1d81-376a7221-921600-199d0351f02b22%22%2C%22first_id%22%3A%22%22%2C%22props%22%3A%7B%22%24latest_traffic_source_type%22%3A%22%E7%9B%B4%E6%8E%A5%E6%B5%81%E9%87%8F%22%2C%22%24latest_search_keyword%22%3A%22%E6%9C%AA%E5%8F%96%E5%88%B0%E5%80%BC_%E7%9B%B4%E6%8E%A5%E6%89%93%E5%BC%80%22%2C%22%24latest_referrer%22%3A%22%22%7D%2C%22%24device_id%22%3A%22199d0351f01221-058d5b31ad1d81-376a7221-921600-199d0351f02b22%22%7D",
+        "domain": ".yami.com",
+        "path": "/",
+        "expires": 1794694766.342644,
+        "httpOnly": false,
+        "secure": false,
+        "sameSite": "Lax"
+      },
+      {
+        "name": "ymb_track_session_id",
+        "value": "fdb19fe4-3a9a-9787-49d0-e04f2c22dc92",
+        "domain": ".yami.com",
+        "path": "/",
+        "expires": -1,
+        "httpOnly": false,
+        "secure": false,
+        "sameSite": "Lax"
+      },
+      {
+        "name": "HOT-SALE",
+        "value": "IzCsAZwJhgOYA0xoBZhtPJ0qQJxR6LJSzjAxHZQawpoKhiTABsKAzMautFSbnCgA7AxIohwYU2po0BblGQdhwkNSgRk6kq2hcusthz2KO4DhzSK8QyGPKsowvCjUbSrMIs3k8MkFAtMENxSC4lamRWVhNEJhFIcDIfQNg1IA",
+        "domain": ".yami.com",
+        "path": "/",
+        "expires": 1760141967,
+        "httpOnly": false,
+        "secure": false,
+        "sameSite": "Lax"
+      },
+      {
+        "name": "FLASH-SALE",
+        "value": "IwBgTMwGxjwDSQCwA5QhAZgaYBOMAdjDDUWAFY8MU0doMkkQ8dwpxttERow8KmMpAqEQUTElblUyEITZgklECgU9YGCetD95maoupQkFCorG88Oyii0ooCCrxh4oYxZihRWEcoWcheXoUTAwDc39qMCs2YDQoWkdyM15Q3nhzURAkQkJk3S9aVTi0JB8C8AJwCj9dMTCOeilxMzqXfi86ymd8YD9zXJrMHU53DEjdJohuSHS02Y68MIyRankApzToMXawLx9lxQ53MKNKTEFFFBiIZR5gBX4ieioMfMissShRe8Kf0R7DjMNTnZhHKLgcB-cAiYgw%2BLQCjlV7OGIoT6wyjlSZjOygngrISmIx3KSKOGEBEwFB4AivdasSCZbbeIT0DggCjuUZhGKEOnnQTc%2BgCrDQGEQSgBYRWWCPaRZOzyXieOACNgrCT7Uk5Klq7B9B40mmKZQGOiE3g6yqkRiPCy8DxxGkxXExFj0raIn4oSVeEabfzMVSyDTUZGW3RM-aTYBDQh%2Byp8RyqjThTROaXiXJ-frfG5A8Cba7I3qeKjjCnYiiyh0117K2poIA",
+        "domain": ".yami.com",
+        "path": "/",
+        "expires": 1760141967,
+        "httpOnly": false,
+        "secure": false,
+        "sameSite": "Lax"
+      },
+      {
+        "name": "yamidata_cross",
+        "value": "%7B%22distinct_id%22%3A%22199d03523c13eb-0d64c8ddefd8ab8-376a7221-921600-199d03523c258f%22%2C%22first_id%22%3A%22199d03523c13eb-0d64c8ddefd8ab8-376a7221-921600-199d03523c258f%22%2C%22props%22%3A%7B%7D%2C%22identities%22%3A%22e30%3D%22%2C%22%24device_id%22%3A%22199d03523c13eb-0d64c8ddefd8ab8-376a7221-921600-199d03523c258f%22%7D",
+        "domain": ".yami.com",
+        "path": "/",
+        "expires": 1794694767.556134,
+        "httpOnly": false,
+        "secure": false,
+        "sameSite": "Lax"
+      },
+      {
+        "name": "yamidata_new_user",
+        "value": "1",
+        "domain": ".yami.com",
+        "path": "/",
+        "expires": 1760165999,
+        "httpOnly": false,
+        "secure": false,
+        "sameSite": "Lax"
+      },
+      {
+        "name": "yamidata_visitor_id",
+        "value": "0f851f8a-0451-586e-2074-b263102e7bfe",
+        "domain": ".yami.com",
+        "path": "/",
+        "expires": 1794694767.558138,
+        "httpOnly": false,
+        "secure": false,
+        "sameSite": "Lax"
+      },
+      {
+        "name": "OptanonConsent",
+        "value": "isGpcEnabled=0&datestamp=Fri+Oct+10+2025+15%3A19%3A27+GMT-0700+(Pacific+Daylight+Time)&version=202508.1.0&browserGpcFlag=0&isIABGlobal=false&hosts=&consentId=635fce05-c035-422c-b29d-497a0a440409&interactionCount=0&isAnonUser=1&landingPath=https%3A%2F%2Fwww.yami.com%2Fen&groups=C0001%3A1%2CC0004%3A1%2CC0002%3A1%2CC0003%3A1",
+        "domain": ".yami.com",
+        "path": "/",
+        "expires": 1791670767,
+        "httpOnly": false,
+        "secure": true,
+        "sameSite": "None"
+      },
+      {
+        "name": "zipcode",
+        "value": "91789",
+        "domain": ".yami.com",
+        "path": "/",
+        "expires": 1760739567,
+        "httpOnly": false,
+        "secure": false,
+        "sameSite": "Lax"
+      },
+      {
+        "name": "location_id",
+        "value": "001",
+        "domain": ".yami.com",
+        "path": "/",
+        "expires": 1760739567,
+        "httpOnly": false,
+        "secure": false,
+        "sameSite": "Lax"
+      },
+      {
+        "name": "_gcl_au",
+        "value": "1.1.1841697473.1760134768",
+        "domain": ".yami.com",
+        "path": "/",
+        "expires": 1767910768,
+        "httpOnly": false,
+        "secure": false,
+        "sameSite": "Lax"
+      },
+      {
+        "name": "_gid",
+        "value": "GA1.2.954168131.1760134768",
+        "domain": ".yami.com",
+        "path": "/",
+        "expires": 1760221168,
+        "httpOnly": false,
+        "secure": false,
+        "sameSite": "Lax"
+      },
+      {
+        "name": "_gat_gtag_UA_39051355_1",
+        "value": "1",
+        "domain": ".yami.com",
+        "path": "/",
+        "expires": 1760134828,
+        "httpOnly": false,
+        "secure": false,
+        "sameSite": "Lax"
+      },
+      {
+        "name": "_ga_PWL198180G",
+        "value": "GS2.1.s1760134768$o1$g0$t1760134768$j60$l0$h2014140946",
+        "domain": ".yami.com",
+        "path": "/",
+        "expires": 1794694768.429167,
+        "httpOnly": false,
+        "secure": false,
+        "sameSite": "Lax"
+      },
+      {
+        "name": "_ga",
+        "value": "GA1.1.2112348535.1760134768",
+        "domain": ".yami.com",
+        "path": "/",
+        "expires": 1794694770.76276,
+        "httpOnly": false,
+        "secure": false,
+        "sameSite": "Lax"
+      },
+      {
+        "name": "ar_debug",
+        "value": "1",
+        "domain": ".pinterest.com",
+        "path": "/",
+        "expires": 1791670769.207409,
+        "httpOnly": true,
+        "secure": true,
+        "sameSite": "None"
+      },
+      {
+        "name": "_ga_J4KZCS0X9M",
+        "value": "GS2.1.s1760134768$o1$g0$t1760134768$j60$l0$h2107946248",
+        "domain": ".yami.com",
+        "path": "/",
+        "expires": 1794694768.601643,
+        "httpOnly": false,
+        "secure": false,
+        "sameSite": "Lax"
+      },
+      {
+        "name": "_pin_unauth",
+        "value": "dWlkPVltWmhaVGd4TkRndE5XSTJPUzAwTnpGbExXRmxOVFF0TWpRMk1UWTVNR0V6WlRBMg",
+        "domain": ".yami.com",
+        "path": "/",
+        "expires": 1791670768,
+        "httpOnly": false,
+        "secure": false,
+        "sameSite": "Lax"
+      },
+      {
+        "name": "test_cookie",
+        "value": "CheckForPermission",
+        "domain": ".doubleclick.net",
+        "path": "/",
+        "expires": 1760135668.983879,
+        "httpOnly": false,
+        "secure": true,
+        "sameSite": "None"
+      },
+      {
+        "name": "_pinterest_ct_ua",
+        "value": "TWc9PSZIeXo2K3FFb3FTRUxYcGtjZnNQcFVGVFhFU3dROWVmeGgrNzA4ZzY4dmp5cE1kOHZmaExBaElOZ1VJSWFZNEVpa1hhZ1lxZjRwQ3l3OGJDbmhrNmVGcHdVM25sTit6ZVZPQVQ5Zi9GZjRlZz0mUlNqbnBKOFpTMnByQTU4SS9hQ3VwZm9EWDRZPQ==",
+        "domain": ".ct.pinterest.com",
+        "path": "/",
+        "expires": 1791670769.207511,
+        "httpOnly": false,
+        "secure": true,
+        "sameSite": "None"
+      },
+      {
+        "name": "CLID",
+        "value": "7eb48c3509454f6c9ce60b174fa5902f.20251010.20261010",
+        "domain": "www.clarity.ms",
+        "path": "/",
+        "expires": 1791670784.584687,
+        "httpOnly": true,
+        "secure": true,
+        "sameSite": "None"
+      },
+      {
+        "name": "_clck",
+        "value": "1n02uju%5E2%5Eg01%5E0%5E2109",
+        "domain": ".yami.com",
+        "path": "/",
+        "expires": 1791670784,
+        "httpOnly": false,
+        "secure": false,
+        "sameSite": "Lax"
+      },
+      {
+        "name": "_clsk",
+        "value": "1igmlse%5E1760134785105%5E1%5E1%5Ea.clarity.ms%2Fcollect",
+        "domain": ".yami.com",
+        "path": "/",
+        "expires": 1760221185,
+        "httpOnly": false,
+        "secure": false,
+        "sameSite": "Lax"
+      },
+      {
+        "name": "_fbp",
+        "value": "fb.1.1760134787654.78228269250784482",
+        "domain": ".yami.com",
+        "path": "/",
+        "expires": 1767910787,
+        "httpOnly": false,
+        "secure": false,
+        "sameSite": "Lax"
+      },
+      {
+        "name": "_ga_JN08G8MDMP",
+        "value": "GS2.1.s1760134770$o1$g1$t1760134787$j43$l0$h0",
+        "domain": ".yami.com",
+        "path": "/",
+        "expires": 1794694787.82445,
+        "httpOnly": false,
+        "secure": false,
+        "sameSite": "Lax"
+      },
+      {
+        "name": "SM",
+        "value": "T",
+        "domain": ".c.clarity.ms",
+        "path": "/",
+        "expires": -1,
+        "httpOnly": false,
+        "secure": true,
+        "sameSite": "None"
+      },
+      {
+        "name": "MUID",
+        "value": "3DE1DFE1B2F568393D77C960B6F5665C",
+        "domain": ".clarity.ms",
+        "path": "/",
+        "expires": 1793830787.924198,
+        "httpOnly": false,
+        "secure": true,
+        "sameSite": "None"
+      }
+    ],
+    "localStorage": {
+      "lastExternalReferrer": "empty",
+      "_gcl_ls": "{\"schema\":\"gcl\",\"version\":1,\"gcl_ctr\":{\"value\":{\"value\":0,\"timeouts\":0,\"creationTimeMs\":1760134767974},\"expires\":1767910767974}}",
+      "lastExternalReferrerTime": "1760134787642",
+      "ymb_utms": "[{\"utm_platform\":null,\"utm_source\":null,\"utm_medium\":\"DirectMedium\",\"utm_campaign\":null,\"utm_term\":null,\"utm_content\":\"https://www.yami.com/en\",\"utm_visittime\":1760134766377}]"
+    },
+    "thirdParties": [
+      "alb.reddit.com",
+      "service.force.com",
+      "c.bing.com",
+      "www.google-analytics.com",
+      "analytics.google.com",
+      "www.gstatic.com",
+      "cdn.yamibuy.com",
+      "www.facebook.com",
+      "scripts.clarity.ms",
+      "cdn.cookielaw.org",
+      "geolocation.onetrust.com",
+      "stats.g.doubleclick.net",
+      "cdn.yamibuy.net",
+      "a.clarity.ms",
+      "www.clarity.ms",
+      "www.redditstatic.com",
+      "www.googletagmanager.com",
+      "bi.api.yamibuy.com",
+      "pixel-config.reddit.com",
+      "logcollect.yamibuy.net",
+      "cognito-identity.us-west-2.amazonaws.com",
+      "www.google.com",
+      "connect.facebook.net",
+      "analytics.yamibuy.net",
+      "sensorsdatacollect.yamibuy.net",
+      "ct.pinterest.com",
+      "unpkg.com",
+      "bat.bing.com",
+      "s.pinimg.com",
+      "ecapi.yami.com",
+      "c.clarity.ms",
+      "firebase.googleapis.com",
+      "firebaseinstallations.googleapis.com",
+      "googleads.g.doubleclick.net"
+    ],
+    "humanReadableAnalysis": "**Risk Level**: Medium \n\n**Key Findings**:\n- Several third-party tracking cookies (Google Analytics, Facebook, Pinterest, etc.) posing privacy concerns.\n- Use of fingerprinting techniques like \"_rdt_uuid\" cookie for user tracking.\n\n**Quick Recommendations**:\n- Review and minimize use of non-essential third-party trackers.\n- Implement privacy-by-design principles and provide clear user consent mechanisms.\n- Explore use of server-side tracking to reduce client-side fingerprinting."
+  },
+  "compliance_analysis": {
+    "gdpr": {
+      "framework": "GDPR",
+      "score": 0,
+      "status": "non_compliant",
+      "passed_controls": [],
+      "failed_controls": [],
+      "warnings": [],
+      "recommendations": []
+    },
+    "ccpa": {
+      "framework": "CCPA",
+      "score": 0,
+      "status": "non_compliant",
+      "passed_controls": [],
+      "failed_controls": [],
+      "warnings": [],
+      "recommendations": []
+    }
+  },
+  "third_party_risks": [
+    {
+      "domain": "alb.reddit.com",
+      "category": "Unknown",
+      "risk_level": "medium",
+      "recommendation": "Review data processing agreement with alb.reddit.com"
+    },
+    {
+      "domain": "service.force.com",
+      "category": "Unknown",
+      "risk_level": "medium",
+      "recommendation": "Review data processing agreement with service.force.com"
+    },
+    {
+      "domain": "c.bing.com",
+      "category": "Unknown",
+      "risk_level": "medium",
+      "recommendation": "Review data processing agreement with c.bing.com"
+    },
+    {
+      "domain": "www.google-analytics.com",
+      "category": "Analytics",
+      "risk_level": "low",
+      "recommendation": "Review data processing agreement with www.google-analytics.com"
+    },
+    {
+      "domain": "analytics.google.com",
+      "category": "Unknown",
+      "risk_level": "medium",
+      "recommendation": "Review data processing agreement with analytics.google.com"
+    },
+    {
+      "domain": "www.gstatic.com",
+      "category": "Unknown",
+      "risk_level": "medium",
+      "recommendation": "Review data processing agreement with www.gstatic.com"
+    },
+    {
+      "domain": "cdn.yamibuy.com",
+      "category": "Unknown",
+      "risk_level": "medium",
+      "recommendation": "Review data processing agreement with cdn.yamibuy.com"
+    },
+    {
+      "domain": "www.facebook.com",
+      "category": "Advertising",
+      "risk_level": "medium",
+      "recommendation": "Review data processing agreement with www.facebook.com"
+    },
+    {
+      "domain": "scripts.clarity.ms",
+      "category": "Unknown",
+      "risk_level": "medium",
+      "recommendation": "Review data processing agreement with scripts.clarity.ms"
+    },
+    {
+      "domain": "cdn.cookielaw.org",
+      "category": "Unknown",
+      "risk_level": "medium",
+      "recommendation": "Review data processing agreement with cdn.cookielaw.org"
+    },
+    {
+      "domain": "geolocation.onetrust.com",
+      "category": "Unknown",
+      "risk_level": "medium",
+      "recommendation": "Review data processing agreement with geolocation.onetrust.com"
+    },
+    {
+      "domain": "stats.g.doubleclick.net",
+      "category": "Advertising",
+      "risk_level": "medium",
+      "recommendation": "Review data processing agreement with stats.g.doubleclick.net"
+    },
+    {
+      "domain": "cdn.yamibuy.net",
+      "category": "Unknown",
+      "risk_level": "medium",
+      "recommendation": "Review data processing agreement with cdn.yamibuy.net"
+    },
+    {
+      "domain": "a.clarity.ms",
+      "category": "Unknown",
+      "risk_level": "medium",
+      "recommendation": "Review data processing agreement with a.clarity.ms"
+    },
+    {
+      "domain": "www.clarity.ms",
+      "category": "Unknown",
+      "risk_level": "medium",
+      "recommendation": "Review data processing agreement with www.clarity.ms"
+    },
+    {
+      "domain": "www.redditstatic.com",
+      "category": "Unknown",
+      "risk_level": "medium",
+      "recommendation": "Review data processing agreement with www.redditstatic.com"
+    },
+    {
+      "domain": "www.googletagmanager.com",
+      "category": "Analytics",
+      "risk_level": "low",
+      "recommendation": "Review data processing agreement with www.googletagmanager.com"
+    },
+    {
+      "domain": "bi.api.yamibuy.com",
+      "category": "Unknown",
+      "risk_level": "medium",
+      "recommendation": "Review data processing agreement with bi.api.yamibuy.com"
+    },
+    {
+      "domain": "pixel-config.reddit.com",
+      "category": "Unknown",
+      "risk_level": "medium",
+      "recommendation": "Review data processing agreement with pixel-config.reddit.com"
+    },
+    {
+      "domain": "logcollect.yamibuy.net",
+      "category": "Unknown",
+      "risk_level": "medium",
+      "recommendation": "Review data processing agreement with logcollect.yamibuy.net"
+    },
+    {
+      "domain": "cognito-identity.us-west-2.amazonaws.com",
+      "category": "Unknown",
+      "risk_level": "medium",
+      "recommendation": "Review data processing agreement with cognito-identity.us-west-2.amazonaws.com"
+    },
+    {
+      "domain": "www.google.com",
+      "category": "Unknown",
+      "risk_level": "medium",
+      "recommendation": "Review data processing agreement with www.google.com"
+    },
+    {
+      "domain": "connect.facebook.net",
+      "category": "Advertising",
+      "risk_level": "medium",
+      "recommendation": "Review data processing agreement with connect.facebook.net"
+    },
+    {
+      "domain": "analytics.yamibuy.net",
+      "category": "Unknown",
+      "risk_level": "medium",
+      "recommendation": "Review data processing agreement with analytics.yamibuy.net"
+    },
+    {
+      "domain": "sensorsdatacollect.yamibuy.net",
+      "category": "Unknown",
+      "risk_level": "medium",
+      "recommendation": "Review data processing agreement with sensorsdatacollect.yamibuy.net"
+    },
+    {
+      "domain": "ct.pinterest.com",
+      "category": "Unknown",
+      "risk_level": "medium",
+      "recommendation": "Review data processing agreement with ct.pinterest.com"
+    },
+    {
+      "domain": "unpkg.com",
+      "category": "Unknown",
+      "risk_level": "medium",
+      "recommendation": "Review data processing agreement with unpkg.com"
+    },
+    {
+      "domain": "bat.bing.com",
+      "category": "Unknown",
+      "risk_level": "medium",
+      "recommendation": "Review data processing agreement with bat.bing.com"
+    },
+    {
+      "domain": "s.pinimg.com",
+      "category": "Unknown",
+      "risk_level": "medium",
+      "recommendation": "Review data processing agreement with s.pinimg.com"
+    },
+    {
+      "domain": "ecapi.yami.com",
+      "category": "Unknown",
+      "risk_level": "medium",
+      "recommendation": "Review data processing agreement with ecapi.yami.com"
+    },
+    {
+      "domain": "c.clarity.ms",
+      "category": "Unknown",
+      "risk_level": "medium",
+      "recommendation": "Review data processing agreement with c.clarity.ms"
+    },
+    {
+      "domain": "firebase.googleapis.com",
+      "category": "Unknown",
+      "risk_level": "medium",
+      "recommendation": "Review data processing agreement with firebase.googleapis.com"
+    },
+    {
+      "domain": "firebaseinstallations.googleapis.com",
+      "category": "Unknown",
+      "risk_level": "medium",
+      "recommendation": "Review data processing agreement with firebaseinstallations.googleapis.com"
+    },
+    {
+      "domain": "googleads.g.doubleclick.net",
+      "category": "Advertising",
+      "risk_level": "medium",
+      "recommendation": "Review data processing agreement with googleads.g.doubleclick.net"
+    }
+  ],
+  "overall_summary": {
+    "overall_score": 0.0,
+    "total_passed": 0,
+    "total_failed": 0,
+    "total_warnings": 0,
+    "frameworks_analyzed": 2
+  }
+}

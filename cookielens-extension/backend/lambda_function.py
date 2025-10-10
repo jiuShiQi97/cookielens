@@ -72,55 +72,69 @@ Keep it SHORT and actionable. Focus on the most critical issues only."""
 
 def scan_website(url):
     """Core website scanning logic that can be reused by both Lambda and FastAPI"""
-    print(f"Scanning {url}")
+    print(f"🌐 Starting website scan for: {url}")
+    print(f"⏰ Scan started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     
     with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True, args=["--no-sandbox"])
-            context = browser.new_context()
-            page = context.new_page()
+        print("🚀 Launching browser...")
+        browser = p.chromium.launch(headless=True, args=["--no-sandbox"])
+        context = browser.new_context()
+        page = context.new_page()
 
-            third_parties = set()
+        third_parties = set()
+        print("📡 Setting up request monitoring...")
 
-            def on_request(request):
-                try:
-                    host = urlparse(request.url).hostname or ""
-                    base_host = urlparse(url).hostname or ""
-                    if not host.endswith(base_host):
-                        third_parties.add(host)
-                except:
-                    pass
+        def on_request(request):
+            try:
+                host = urlparse(request.url).hostname or ""
+                base_host = urlparse(url).hostname or ""
+                if not host.endswith(base_host):
+                    third_parties.add(host)
+            except:
+                pass
 
-            page.on("request", on_request)
-            page.goto(url, wait_until="load", timeout=60000)
+        page.on("request", on_request)
+        print(f"🔗 Navigating to: {url}")
+        page.goto(url, wait_until="load", timeout=60000)
+        print("✅ Page loaded successfully!")
 
-            cookies = context.cookies()
-            local_storage = page.evaluate("""
-                () => {
-                    const data = {};
-                    for (let i = 0; i < localStorage.length; i++) {
-                        const key = localStorage.key(i);
-                        data[key] = localStorage.getItem(key);
-                    }
-                    return data;
+        print("🍪 Extracting cookies...")
+        cookies = context.cookies()
+        print(f"📊 Found {len(cookies)} cookies")
+        
+        print("💾 Extracting localStorage...")
+        local_storage = page.evaluate("""
+            () => {
+                const data = {};
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    data[key] = localStorage.getItem(key);
                 }
-            """)
-
-            scan = {
-                "url": url,
-                "scannedAt": datetime.utcnow().isoformat(),
-                "cookies": cookies,
-                "localStorage": local_storage,
-                "thirdParties": list(third_parties)
+                return data;
             }
+        """)
+        print(f"📊 Found {len(local_storage)} localStorage items")
 
-            browser.close()
+        scan = {
+            "url": url,
+            "scannedAt": datetime.utcnow().isoformat(),
+            "cookies": cookies,
+            "localStorage": local_storage,
+            "thirdParties": list(third_parties)
+        }
+
+        print(f"🔗 Detected {len(third_parties)} third-party services")
+        browser.close()
+        print("🔒 Browser closed")
 
     # Analyze scan results with Claude
-    print("Analyzing with Claude...")
+    print("🤖 Starting AI analysis with Claude...")
     scan["humanReadableAnalysis"] = analyze_with_claude(scan)
+    print("✅ AI analysis completed!")
 
     # Upload to S3 (optional)
     if os.getenv("S3_BUCKET"):
+        print("☁️ Uploading results to S3...")
         s3 = boto3.client("s3")
         key = f"scans/{datetime.utcnow().isoformat()}_scan.json"
         s3.put_object(
@@ -130,7 +144,9 @@ def scan_website(url):
             ContentType="application/json"
         )
         scan["s3Path"] = f"s3://{os.getenv('S3_BUCKET')}/{key}"
+        print(f"✅ Results uploaded to: {scan['s3Path']}")
 
+    print(f"⏰ Scan completed at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     return scan
 
 def lambda_handler(event, context):
