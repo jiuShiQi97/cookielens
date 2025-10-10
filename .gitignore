@@ -244,7 +244,7 @@ lambda-deployment*.zip
 *.swo
 *~
 
-# OS
+# macOS
 .DS_Store
 .DS_Store?
 ._*
@@ -260,3 +260,15 @@ logs/
 # Temporary files
 tmp/
 temp/
+
+# Build outputs
+dist/
+build/
+
+# Backend specific
+backend/venv/
+backend/node_modules/
+backend/dist/
+backend/build/
+backend/coverage/
+backend/logs/

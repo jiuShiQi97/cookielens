@@ -1,0 +1,6 @@
+playwright==1.48.0
+boto3
+requests
+fastapi
+uvicorn[standard]
+pydantic
