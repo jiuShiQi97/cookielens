@@ -7,31 +7,31 @@ from urllib.parse import urlparse
 from datetime import datetime
 
 def analyze_with_claude(scan_data):
-    """使用AWS Bedrock Claude模型分析扫描结果，生成人类可读的隐私报告"""
+    """Use AWS Bedrock Claude model to analyze scan results and generate a human-readable privacy report"""
     try:
-        # 使用Bedrock API Key认证
+        # Authenticate using Bedrock API Key
         api_key = os.getenv('BEDROCK_API_KEY','ABSKTGktYXQtNDQwNzQ0MjUwNzIwOlRxQkJLWEFIRWFKaGZaU0lsZjF5SlRza1NEK1FIMk9aS1hqUGVyOEhWcVpzTHlzL0t1YnBLKzI4VnZVPQ==')
         if not api_key:
-            return "错误：未设置BEDROCK_API_KEY环境变量。请运行: export BEDROCK_API_KEY='your_api_key'"
+            return "Error: BEDROCK_API_KEY environment variable not set. Please run: export BEDROCK_API_KEY='your_api_key'"
         
         region = os.getenv('AWS_REGION', 'us-east-1')
         
-        # 构建分析prompt
-        prompt = f"""请分析以下网站隐私扫描结果，生成一份简洁易懂的隐私分析报告。
+        # Build analysis prompt
+        prompt = f"""Please analyze the following website privacy scan results and generate a concise and easy-to-understand privacy analysis report.
 
-扫描数据：
+Scan data:
 {json.dumps(scan_data, indent=2)}
 
-请从以下几个维度进行分析：
-1. **Cookie安全性**：检查httpOnly、secure、sameSite等安全属性
-2. **数据存储**：localStorage中存储了哪些数据
-3. **第三方服务**：识别并说明检测到的第三方域名用途
-4. **隐私风险评级**：低/中/高，并说明原因
-5. **改进建议**：如果有安全隐患，提供具体建议
+Please analyze from the following dimensions:
+1. **Cookie Security**: Check security attributes such as httpOnly, secure, sameSite, etc.
+2. **Data Storage**: What data is stored in localStorage
+3. **Third-party Services**: Identify and explain the purpose of detected third-party domains
+4. **Privacy Risk Rating**: Low/Medium/High, and explain the reason
+5. **Improvement Recommendations**: If there are security risks, provide specific suggestions
 
-请用清晰的中文回答，使用markdown格式，适合非技术人员阅读。"""
+Please answer clearly in English, using markdown format, suitable for non-technical readers."""
 
-        # 使用HTTP请求调用Bedrock API
+        # Call Bedrock API using HTTP request
         url = f"https://bedrock-runtime.{region}.amazonaws.com/model/anthropic.claude-3-sonnet-20240229-v1:0/invoke"
         
         headers = {
@@ -51,10 +51,10 @@ def analyze_with_claude(scan_data):
             ]
         }
         
-        response = requests.post(url, headers=headers, json=payload, timeout=30)
+        response = requests.post(url, headers=headers, json=payload, timeout=60)
         response.raise_for_status()
         
-        # 解析响应
+        # Parse response
         response_data = response.json()
         analysis = response_data['content'][0]['text']
         
@@ -62,19 +62,16 @@ def analyze_with_claude(scan_data):
         
     except requests.exceptions.RequestException as e:
         print(f"Bedrock API request failed: {e}")
-        return f"API调用失败：{str(e)}"
+        return f"API call failed: {str(e)}"
     except Exception as e:
         print(f"Bedrock analysis failed: {e}")
-        return f"分析失败：{str(e)}"
+        return f"Analysis failed: {str(e)}"
 
-def lambda_handler(event, context):
-    try:
-        # 从 API Gateway 事件中取 body
-        body = json.loads(event.get("body", "{}"))
-        url = body.get("url", "https://example.com")
-        print(f"Scanning {url}")
-
-        with sync_playwright() as p:
+def scan_website(url):
+    """Core website scanning logic that can be reused by both Lambda and FastAPI"""
+    print(f"Scanning {url}")
+    
+    with sync_playwright() as p:
             browser = p.chromium.launch(headless=True, args=["--no-sandbox"])
             context = browser.new_context()
             page = context.new_page()
@@ -115,22 +112,34 @@ def lambda_handler(event, context):
 
             browser.close()
 
-        # 使用Claude分析扫描结果
-        print("Analyzing with Claude...")
-        scan["humanReadableAnalysis"] = analyze_with_claude(scan)
+    # Analyze scan results with Claude
+    print("Analyzing with Claude...")
+    scan["humanReadableAnalysis"] = analyze_with_claude(scan)
 
-        # 上传到 S3（可选）
-        if os.getenv("S3_BUCKET"):
-            s3 = boto3.client("s3")
-            key = f"scans/{datetime.utcnow().isoformat()}_scan.json"
-            s3.put_object(
-                Bucket=os.getenv("S3_BUCKET"),
-                Key=key,
-                Body=json.dumps(scan, indent=2),
-                ContentType="application/json"
-            )
-            scan["s3Path"] = f"s3://{os.getenv('S3_BUCKET')}/{key}"
+    # Upload to S3 (optional)
+    if os.getenv("S3_BUCKET"):
+        s3 = boto3.client("s3")
+        key = f"scans/{datetime.utcnow().isoformat()}_scan.json"
+        s3.put_object(
+            Bucket=os.getenv("S3_BUCKET"),
+            Key=key,
+            Body=json.dumps(scan, indent=2),
+            ContentType="application/json"
+        )
+        scan["s3Path"] = f"s3://{os.getenv('S3_BUCKET')}/{key}"
 
+    return scan
+
+def lambda_handler(event, context):
+    """AWS Lambda handler function"""
+    try:
+        # Get body from API Gateway event
+        body = json.loads(event.get("body", "{}"))
+        url = body.get("url", "https://example.com")
+        
+        # Call core scanning logic
+        scan = scan_website(url)
+        
         return {
             "statusCode": 200,
             "headers": {"Content-Type": "application/json"},
@@ -144,16 +153,16 @@ def lambda_handler(event, context):
             "body": json.dumps({"error": str(e)})
         }
 
-# 本地调试用
+# For local debugging
 if __name__ == "__main__":
     event = {"body": json.dumps({"url": "https://openai.com"})}
     result = lambda_handler(event, None)
     print("\n" + "="*80)
-    print("扫描结果：")
+    print("Scan Results:")
     print("="*80)
     response = json.loads(result['body'])
     if 'humanReadableAnalysis' in response:
-        print("\n📊 Claude AI 分析报告：")
+        print("\n📊 Claude AI Analysis Report:")
         print(response['humanReadableAnalysis'])
     else:
         print(json.dumps(response, indent=2, ensure_ascii=False))
