@@ -84,54 +84,84 @@ class ComplianceAnalyzer:
         local_storage = scan_results.get('localStorage', {})
         third_parties = scan_results.get('thirdParties', [])
         
-        # Check cookie security attributes
-        for control in controls:
-            control_id = control.get('id', '')
+        # If no controls provided, run standard checks
+        if not controls:
+            # Run all standard compliance checks
+            checks_to_run = [
+                ('consent', self._check_consent_mechanism, scan_results),
+                ('secure', self._check_secure_flag, cookies),
+                ('httponly', self._check_httponly_flag, cookies),
+                ('samesite', self._check_samesite_attribute, cookies),
+                ('third-party', self._check_third_party_disclosure, third_parties)
+            ]
             
-            if 'consent' in control_id.lower():
-                # Check for consent mechanism
-                result = self._check_consent_mechanism(scan_results)
-                if result['passed']:
-                    passed_controls.append(result['message'])
+            for check_name, check_func, check_arg in checks_to_run:
+                result = check_func(check_arg)
+                if check_name in ['samesite', 'third-party']:
+                    # These are warnings, not failures
+                    if result['passed']:
+                        passed_controls.append(result['message'])
+                    else:
+                        warnings.append(result['message'])
+                        if result['recommendation']:
+                            recommendations.append(result['recommendation'])
                 else:
-                    failed_controls.append(result['message'])
-                    recommendations.append(result['recommendation'])
-            
-            elif 'secure' in control_id.lower():
-                # Check Secure flag on cookies
-                result = self._check_secure_flag(cookies)
-                if result['passed']:
-                    passed_controls.append(result['message'])
-                else:
-                    failed_controls.append(result['message'])
-                    recommendations.append(result['recommendation'])
-            
-            elif 'httponly' in control_id.lower():
-                # Check httpOnly flag on cookies
-                result = self._check_httponly_flag(cookies)
-                if result['passed']:
-                    passed_controls.append(result['message'])
-                else:
-                    failed_controls.append(result['message'])
-                    recommendations.append(result['recommendation'])
-            
-            elif 'samesite' in control_id.lower():
-                # Check sameSite attribute
-                result = self._check_samesite_attribute(cookies)
-                if result['passed']:
-                    passed_controls.append(result['message'])
-                else:
-                    warnings.append(result['message'])
-                    recommendations.append(result['recommendation'])
-            
-            elif 'third-party' in control_id.lower():
-                # Check third-party documentation
-                result = self._check_third_party_disclosure(third_parties)
-                if result['passed']:
-                    passed_controls.append(result['message'])
-                else:
-                    warnings.append(result['message'])
-                    recommendations.append(result['recommendation'])
+                    # These are critical checks
+                    if result['passed']:
+                        passed_controls.append(result['message'])
+                    else:
+                        failed_controls.append(result['message'])
+                        if result['recommendation']:
+                            recommendations.append(result['recommendation'])
+        else:
+            # Check cookie security attributes based on controls
+            for control in controls:
+                control_id = control.get('id', '')
+                
+                if 'consent' in control_id.lower():
+                    # Check for consent mechanism
+                    result = self._check_consent_mechanism(scan_results)
+                    if result['passed']:
+                        passed_controls.append(result['message'])
+                    else:
+                        failed_controls.append(result['message'])
+                        recommendations.append(result['recommendation'])
+                
+                elif 'secure' in control_id.lower():
+                    # Check Secure flag on cookies
+                    result = self._check_secure_flag(cookies)
+                    if result['passed']:
+                        passed_controls.append(result['message'])
+                    else:
+                        failed_controls.append(result['message'])
+                        recommendations.append(result['recommendation'])
+                
+                elif 'httponly' in control_id.lower():
+                    # Check httpOnly flag on cookies
+                    result = self._check_httponly_flag(cookies)
+                    if result['passed']:
+                        passed_controls.append(result['message'])
+                    else:
+                        failed_controls.append(result['message'])
+                        recommendations.append(result['recommendation'])
+                
+                elif 'samesite' in control_id.lower():
+                    # Check sameSite attribute
+                    result = self._check_samesite_attribute(cookies)
+                    if result['passed']:
+                        passed_controls.append(result['message'])
+                    else:
+                        warnings.append(result['message'])
+                        recommendations.append(result['recommendation'])
+                
+                elif 'third-party' in control_id.lower():
+                    # Check third-party documentation
+                    result = self._check_third_party_disclosure(third_parties)
+                    if result['passed']:
+                        passed_controls.append(result['message'])
+                    else:
+                        warnings.append(result['message'])
+                        recommendations.append(result['recommendation'])
         
         # Calculate compliance score
         total_checks = len(passed_controls) + len(failed_controls)
